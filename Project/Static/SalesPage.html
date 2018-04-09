@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<HTML>
+
+<!--  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!--  +++++++++++++++++++++++++++++++++++++++       HEADINGS            ++++++++++++++++++++++++++++++++++++++ -->
+<!--  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<HEAD>
+
+    <!--  +++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!--  +++++++++++++++   PAGE INFO   +++++++++++++++++++ -->
+    <!--  +++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+        <!-- Please UFT IS LOVE -->
+        <meta charset="UTF-8">
+
+        <!-- How we should see it -->
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <!-- Color in Android Header -->
+        <meta name="theme-color" content="#db5945">
+
+        <!-- Icon of the App -->
+        <!--link rel="icon" sizes="192x192" href="AppIcon.png"-->
+
+        <title>Sales Page</title>
+
+
+    <!--  +++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!--  +++++++++++++++   PAGE STYLE  +++++++++++++++++++ -->
+    <!--  +++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+        <!-- Google Material Fonts -->
+        <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        
+        <!-- Compiled Materialize CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+
+        <!-- Compiled Materialize jQuery -->
+        <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+        <!-- Compiled Materialize Javascript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+</HEAD>
+
+
+<!--  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!--  +++++++++++++++++++++++++++++++++++++++       BODY                ++++++++++++++++++++++++++++++++++++++ -->
+<!--  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<BODY>
+
+
+    <!--  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!--  +++++++++++++++++    NAVITAGION BAR       +++++++++++++++++++++ -->
+    <!--  ++++++++++++++++++++++++*++++++++++++++++++++++++++++++++++++++ -->
+    <HEADER>
+
+        <!-- NAV BAR FOR DESKTOP -->
+        <div class="navbar-fixed">
+
+            <nav class="indigo darken-2">
+                <div class="nav-wrapper container">
+
+                    <!-- NAME OF PAGE -->
+                    <div class="brand-logo white-text" style="font-size: 1.5rem;">
+                        
+                        <!-- HOME FOR DESKTOP -->
+                        <a class="hide-on-med-and-down" href="/index.html">
+                            <i class="material-icons">home</i>
+                        </a>
+                        
+                        <!-- NAME OF THIS PAGE -->
+                        Sales Page
+                    </div>
+
+                    <!-- HOME FOR MOBILE -->
+                    <a href="/MaterializeWebTemplate/Web/" class="brand-logo right hide-on-large-only">
+                        <i class="material-icons white-text">home</i>
+                    </a>
+
+                    <!-- Menu for Mobile -->
+                    <a href="#" data-activates="mobile-demo" class="button-collapse">
+                        <i class="material-icons white-text">menu</i>
+                    </a>
+                     
+                    <!-- Links for Normal Web -->
+                    <ul class="right hide-on-med-and-down">
+                                                    
+                        <li>
+                            <a class="white-text" href="index.html">
+                                Home                                
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </nav>
+
+        </div>
+
+        <!-- SIDE BAR FOR MOBILE -->
+        <ul class="side-nav indigo lighten-1" id="mobile-demo">
+
+            <!-- Links for Mobile Web -->
+            <div id="MobileHeaderSideNav">
+                <br><br>
+
+                <h4 class="center-align white-text" style="font-weight: 300;">
+                    <b>Pages</b> Menu
+                </h4>
+
+                <br><br>
+            </div>
+
+                            
+            <li>
+                <a class="white-text" href="index.html">
+                    <span class="flow-text">
+                        Home                        
+                    </span>
+                </a>
+            </li>
+                
+                        
+        </ul>
+
+        <script>
+            $(document).ready(function() {
+                $(".button-collapse").sideNav()
+            })
+        </script>
+
+
+    </HEADER>
+
+    <!--  ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!--  +++++++++    BERNOULLI DISTRIBUTION     ++++++++++++ -->
+    <!--  ++++++++++++++++++++++++*+++++++++++++++++++++++++++ -->
+    <DIV class="container">
+    
+        <div class="center-align row section">
+
+            <div class="col s12">
+            <div class="card-panel blue-grey lighten-5">
+            
+                <div class="black-text">
+                    
+                    <div class="row section">
+
+                        <div class="input-field col s7 offset-s1 center-align valign-wrapper">
+                            <span class="hide-on-small-only" style="font-weight: 300; font-size: 2rem">
+                                Por Pagar: &nbsp;&nbsp;
+                            </span>
+
+                            <span style="font-weight: 600; font-size: 2rem">$0.00</span>
+                        </div>
+
+                        <div class="s4">
+                            <a class="waves-effect waves-light btn-large">Pagar</a>
+                        </div>
+
+                    </div>
+
+
+                    <div class="divider"></div>
+
+                    <div class="section">
+
+                        <div class="row">
+                            
+                            <div class="input-field col s1">
+                                <input id="icon_prefix" type="text" class="validate">
+                                <label for="icon_prefix">
+                                    <div style="font-size: 0.8em">
+                                        Cantidad
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="input-field col s1">
+                                <input id="icon_prefix" type="text" class="validate">
+                                <label for="icon_prefix">
+                                    <div style="font-size: 0.9em">
+                                        Precio
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="input-field col s5">
+                                <input id="icon_prefix" type="text" class="validate">
+                                <label for="icon_prefix">Código de Barras del Producto</label>
+                            </div>
+
+                            <div class="input-field col s5">
+                                <input id="icon_prefix" type="text" class="validate">
+                                <label for="icon_prefix">Buscar por Precio</label>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="row section">
+                        <table class="container bordered striped col s10 offset-s1 responsive-table">
+                            <thead>
+                              <tr>
+                                  <th>Cantidad</th>
+                                  <th>Producto</th>
+                                  <th>Precio</th>
+                              </tr>
+                            </thead>
+
+                            <tbody>
+                              <tr>
+                                <td>Alvin</td>
+                                <td>Eclair</td>
+                                <td>$0.87</td>
+                              </tr>
+                              <tr>
+                                <td>Alan</td>
+                                <td>Jellybean</td>
+                                <td>$3.76</td>
+                              </tr>
+                              <tr>
+                                <td>Jonathan</td>
+                                <td>Lollipop</td>
+                                <td>$7.00</td>
+                              </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+     
+
+                </div>
+
+            </div>
+            </div>
+
+        </div>
+
+
+
+
+    </DIV>
+
+
+
+
+    <!--  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!--  ++++++++++++++           FOOTER           +++++++++++++++++++++ -->
+    <!--  ++++++++++++++++++++++++*++++++++++++++++++++++++++++++++++++++ -->
+    <FOOTER class="page-footer blue-grey darken-3">
+        
+        <div class="row container">
+        
+            <!-- ========================= -->
+            <!-- =======   ABOUT US   ==== -->
+            <!-- ========================= -->
+            <div class="col l6 s12">
+                
+                <!--  =========  Title   ======== -->
+                <h5 class="white-text" style="font-size: 1.1rem;">About This</h5>
+
+                <!--  =========  Text   ======== -->
+                <span class="grey-text text-lighten-4" style="font-size: 0.85rem;">
+                    This is a template for a web project
+                </span>
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- ==   ADITIONAL LINKS   == -->
+            <!-- ========================= -->
+            <div class="col l3 s12">
+                
+                <!--  =========  Title   ======== -->
+                <h5 class="white-text" style="font-size: 1.1rem;">Additional Pages</h5>
+                
+                <!--  =========  Text   ======== -->
+                <ul style="font-size: 0.85rem;">
+                    <li>
+                        <a class="white-text" href="https://github.com/SoyOscarRH/">
+                            <b>Autor: </b>Oscar Andrés
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a class="white-text" href="https://github.com/SoyOscarRH/">
+                            Source Code
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- ==      LAST LINE      == -->
+        <!-- ========================= -->
+        <div class="footer-copyright blue-grey darken-4">
+            <div class="container">
+                <span class="text-lighten-3" style="font-size: 0.8rem;">December 25, 2017</span>
+                <br>
+                <b>Create by</b> <span class="text-lighten-3">CompilandoConocimiento</span>
+            </div>
+        </div>
+
+    </FOOTER>
+
+    
+    <!--  ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!--  ++++++++   GENERAL JS FOR MATERIALIZE CSS   ++++++++ -->
+    <!--  ++++++++++++++++++++++++*+++++++++++++++++++++++++++ -->
+    <SCRIPT>
+        $(document).ready(function() {
+
+        })
+    </SCRIPT>    
+    
+</BODY>
+
+</HTML>
