@@ -28,7 +28,12 @@ export default class App extends React.Component {
                 </header>
 
                 <div className="container">
-                    <SalesPage />
+                    
+                    <div className="center-align row section">
+                        <div className="col s12">
+                            <SalesPage />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
