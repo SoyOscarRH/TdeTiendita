@@ -7,15 +7,15 @@ import React from "react";
 export default class SalesPage extends React.Component {
 
     constructor(props) {
-        super(props);
+        super(props)
+
         this.state = {
             ToPay: 0.0,
             CurrentSell: {
                 Quantity: 1,
                 Name: "",
-                Price: -1
+                PriceInput: ""
             },
-            Price: "",
             Products: [
               {
                 Quantity: 1,
@@ -30,17 +30,27 @@ export default class SalesPage extends React.Component {
                 Price: 7.50,
               }
             ]
-        };
+        }
     }
 
-
-    AddProduct(Event) {
+    AddProduct = (Event) => {
         if (Event.key === 'Enter') {
           console.log('do validate');
           console.log(Event);
         }
     }
 
+    handleQuantityChange = (Event) => {
+        const newState = Object.assign({}, this.state);
+        newState.CurrentSell.Quantity = Event.target.value;
+        if (Number(Event.target.value) != NaN) this.setState(newState);
+    }
+
+    handlePriceInputChange = (Event) => {
+        const newState = Object.assign({}, this.state);
+        newState.CurrentSell.PriceInput = Event.target.value;
+        if (Number(Event.target.value) != NaN) this.setState(newState);
+    }
 
     render () {
 
@@ -86,11 +96,12 @@ export default class SalesPage extends React.Component {
                                   
                                     <div className="input-field col s1">
                                         <input 
-                                            onKeyPress = {this.AddProduct} 
-                                            id = "QuantityInput" 
-                                            type = "text" 
+                                            id        = "QuantityInput" 
+                                            type      = "number" 
                                             className = "validate"
-                                            value = {this.state.CurrentSell.Quantity}  
+                                            step      = "0.001"
+                                            value     = {this.state.CurrentSell.Quantity}  
+                                            onChange  = {this.handleQuantityChange}
                                         />
                                         
                                         <label htmlFor="QuantityInput">
@@ -102,11 +113,12 @@ export default class SalesPage extends React.Component {
 
                                     <div className="input-field col s1">
                                         <input 
-                                            onKeyPress = {this.AddProduct} 
-                                            id = "PriceInput" 
-                                            type = "text" 
+                                            id        = "PriceInput" 
+                                            type      = "number" 
+                                            step      = "0.5"
                                             className = "validate"
-                                            value = {this.state.CurrentSell.Price}  
+                                            value     = {this.state.CurrentSell.PriceInput}  
+                                            onChange  = {this.handlePriceInputChange}
                                         />
 
                                         <label htmlFor="PriceInput">
@@ -135,7 +147,7 @@ export default class SalesPage extends React.Component {
                                             type = "text"
                                             className = "validate" 
                                         />
-                                        <label htmlFor="SearchInput">Buscar por Precio</label>
+                                        <label htmlFor="SearchInput">Buscar por Nombre</label>
                                     </div>
 
                                 </div>
