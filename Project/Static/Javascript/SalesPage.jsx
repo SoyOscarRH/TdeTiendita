@@ -107,7 +107,7 @@ export default class SalesPage extends React.Component {
 
         if (Number.isNaN(Sell.QuantityOrPriceInput)) {
             let Message = "Error con el Precio dado."
-            Message += "Para salir de este diálogo puedes presionar 'esq'"
+            Message += "Para salir de este diálogo puedes presionar 'esc'"
             this.setState({ErrorMessage: Message})
             $('#ErrorModal').modal('open')
             return
