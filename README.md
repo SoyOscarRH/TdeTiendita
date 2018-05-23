@@ -23,10 +23,16 @@
 ## Characteristics
 
 ### Sales Page
+
+<img src="Graphics/SalesPage1.png" width="70%">
+
+
 - Autofocus in codebar
-- If you put `$` then it will be render as a price, for example, 
-`$10` means $10 of an item, like $10 of eggs and `10` is 10 items
+- If you put `$` then it will be render as a price or for example or 
+`$10` means $10 of an item or like $10 of eggs and `10` is 10 items
 - You have a ton of Hot Keys:
+	- MoveFocusToRight: with `shift+right` or `alt+right` or `ctrl+right`
+	- MoveFocusToLeft: with `shift+left` or `alt+left` or `ctrl+left`
     - SendProduct: with `f7` or `enter`
     - MoveToRight: with `shift+right` or `alt+right` or `ctrl+right`
     - MoveToLeft: with `shift+left` or  `alt+left` or  `ctrl+left`
@@ -34,3 +40,6 @@
     - SetFocusToBarCode:  with `f2` or `alt+2` or `shift+2` or `space+2`
     - SetFocusToSearch:   with `f3` or `alt+3` or `shift+3` or `space+3`
     - To close Dialogs use `esc`
+
+
+<img src="Graphics/SalesPage2.png" width="70%">
