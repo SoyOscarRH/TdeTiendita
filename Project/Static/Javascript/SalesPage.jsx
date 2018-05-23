@@ -1,6 +1,6 @@
-import React from "react";
-import {HotKeys} from "react-hotkeys";
-
+import React from "react"
+import {HotKeys} from "react-hotkeys"
+import {Modal, Button} from 'react-materialize'
 
 
 
@@ -17,15 +17,39 @@ export default class SalesPage extends React.Component {
         super(props)
 
         this.state = {
+            ToPay: 0.0,
+            ErrorMessage: "",
+            CurrentSell: {
+                QuantityOrPriceInput: "1",
+                BarCodeInput: " ",
+                SearchInput: " ",
+                IsPrice: false
+            },
             FocusGroup: {
                 CurrentFocus : 1,
-                FocusElements: ["QuantityOrPriceInput", "BarCodeInput", "SearchInput"]
+                FocusElements: [
+                    "QuantityOrPriceInput", 
+                    "BarCodeInput", 
+                    "SearchInput"
+                ]
             },
-            ToPay: 0.0,
-            CurrentSell: {
-                QuantityOrPrice: "1",
-                BarCode: " ",
-                Search: " "
+            HotKeysMapping: {
+                keyMap: {
+                    SendProduct:        ['f7', 'enter'],
+                    MoveToRight:        ['shift+right', 'alt+right', 'ctrl+right'],
+                    MoveToLeft:         ['shift+left',  'alt+left',  'ctrl+left'],
+                    SetFocusToQuantity: ['f1', '|', '!', 'space+1'],
+                    SetFocusToBarCode:  ['f2', '@', '"', 'space+2'],
+                    SetFocusToSearch:   ['f3', '#', '·', 'space+3'],
+                },
+                handlers: {
+                    'SendProduct': (e) => this.handleSendProduct(),
+                    'MoveToRight': (e) => this.handleChangeOfFocus({Direction: "right"}),
+                    'MoveToLeft':  (e) => this.handleChangeOfFocus({Direction: "left"}),
+                    'SetFocusToQuantity':  (e) => this.handleChangeOfFocus({Position: 0}),
+                    'SetFocusToBarCode':   (e) => this.handleChangeOfFocus({Position: 1}),
+                    'SetFocusToSearch':    (e) => this.handleChangeOfFocus({Position: 2}),
+                }
             },
             Products: [
               {
@@ -40,25 +64,7 @@ export default class SalesPage extends React.Component {
                 Code: "mal",
                 Price: 7.50,
               }
-            ],
-            HotKeysMapping: {
-                keyMap: {
-                    SendProduct: 'enter',
-                    MoveToRight: ['shift+right', 'alt+right', 'ctrl+right'],
-                    MoveToLeft: ['shift+left', 'alt+left', 'ctrl+left'],
-                    SetFocusToQuantityOrPrice: ['|'],
-                    SetFocusToBarCode: ['@'],
-                    SetFocusToSearch: ['#'],
-                },
-                handlers: {
-                    'SendProduct': (e) => this.handleSendProduct(),
-                    'MoveToRight': (e) => this.handleChangeOfFocus("right", null),
-                    'MoveToLeft':  (e) => this.handleChangeOfFocus("left", null),
-                    'SetFocusToQuantityOrPrice':  (e) => this.handleChangeOfFocus(null, 0),
-                    'SetFocusToBarCode':          (e) => this.handleChangeOfFocus(null, 1),
-                    'SetFocusToSearch':           (e) => this.handleChangeOfFocus(null, 2),
-                }
-            } 
+            ]
         }
     }
 
@@ -66,24 +72,24 @@ export default class SalesPage extends React.Component {
     // =========================================================
     // ===========              HANDLES            =============
     // =========================================================
-    handleCurrentSaleData (Event, Item) {
+    handleChangeSaleData (Event, Item) {
         const NewCurrentSell = Object.assign({}, this.state.CurrentSell)
         const NewFocusGroup = Object.assign({}, this.state.FocusGroup)
+        
         NewCurrentSell[Item] = Event.target.value
-        NewFocusGroup.CurrentFocus = NewFocusGroup.FocusElements.findIndex(name => name === Item + "Input")
-
+        NewFocusGroup.CurrentFocus = NewFocusGroup.FocusElements.findIndex(name => name === Item)
         this.setState({CurrentSell: NewCurrentSell, FocusGroup: NewFocusGroup})
     }
 
-    handleChangeOfFocus (Direction, Position) {
-        const NewFocusGroup = this.state.FocusGroup
-        let NewCurrentFocus = 1
+    handleChangeOfFocus (Parameters) {
+        const NewFocusGroup = Object.assign({}, this.state.FocusGroup)
+        let NewCurrentFocus = 0
 
-        if (Direction == null) {
-            NewCurrentFocus = Position
+        if (Parameters['Direction'] == undefined) {
+            NewCurrentFocus = Parameters['Position']
         }
         else {
-            const Move = (Direction === "right")? 1: -1;
+            const Move = (Parameters['Direction'] === "right")? 1: -1
             NewCurrentFocus = (NewFocusGroup.CurrentFocus + Move) % 3
             if (NewCurrentFocus < 0) NewCurrentFocus += 3
         }
@@ -95,17 +101,20 @@ export default class SalesPage extends React.Component {
     }
 
     handleSendProduct () {
-        const Sell = this.state.CurrentSell
-        const IsPrice = Sell.QuantityOrPrice[0] === '$'
-        Sell.QuantityOrPrice = Sell.QuantityOrPrice.slice(IsPrice? 1: 0)
+        const Sell = Object.assign({}, this.state.CurrentSell)
+        Sell.IsPrice = Sell.QuantityOrPriceInput[0] === '$'
+        Sell.QuantityOrPriceInput = Number(Sell.QuantityOrPriceInput.slice(Sell.IsPrice? 1: 0))
 
-        if (Number(Sell.QuantityOrPrice) == NaN) {
-            alert("Error en el precio")
+        if (Number.isNaN(Sell.QuantityOrPriceInput)) {
+            let Message = "Error con el Precio dado."
+            Message += "Para salir de este diálogo puedes presionar 'esq'"
+            this.setState({ErrorMessage: Message})
+            $('#ErrorModal').modal('open')
             return
         }
-
-        if (IsPrice) console.log(`Send Price ${Sell.QuantityOrPrice} Code Bar: ${Sell.BarCode}`)
-        else console.log(`Send ${Sell.QuantityOrPrice} of Code Bar: ${Sell.BarCode}`)
+        else {
+            console.log(Sell)
+        }
 
     }
 
@@ -124,7 +133,7 @@ export default class SalesPage extends React.Component {
                     <td>${Product.Price.toFixed(2)}</td>
                 </tr>
             )
-        });
+        })
 
         return (
             <div className="card-panel blue-grey lighten-5 black-text">
@@ -134,10 +143,16 @@ export default class SalesPage extends React.Component {
                 {/*=====================================================*/}
                 <div className="row section">
                     <div className="input-field col s7 offset-s1 center-align valign-wrapper">
-                        <span className="hide-on-small-only" style={{fontWeight: 300, fontSize: '2rem'}}>
+                        <span 
+                            className="hide-on-small-only" 
+                            style={{fontWeight: 300, fontSize: '2rem'}}>
+                            
                             Por Pagar: &nbsp;&nbsp;
+                        
                         </span>
-                        <span style={{fontWeight: 600, fontSize: '2rem'}}>${this.state.ToPay.toFixed(2)}</span>
+                        <span style={{fontWeight: 600, fontSize: '2rem'}}>
+                            ${this.state.ToPay.toFixed(2)}
+                        </span>
                     </div>
 
                     <div className="s4">
@@ -152,7 +167,9 @@ export default class SalesPage extends React.Component {
                 <div className="divider" />
                 <div className="section">
 
-                    <HotKeys keyMap={this.state.HotKeysMapping.keyMap} handlers={this.state.HotKeysMapping.handlers}>
+                    <HotKeys 
+                        keyMap   = {this.state.HotKeysMapping.keyMap} 
+                        handlers = {this.state.HotKeysMapping.handlers}>
                     <div className="row">
                       
                         {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
@@ -160,11 +177,12 @@ export default class SalesPage extends React.Component {
                         {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                         <div className="input-field col s2">
                             <input 
-                                id        = "QuantityOrPriceInput" 
-                                type      = "text"
-                                value     = {this.state.CurrentSell.QuantityOrPrice}
-                                onFocus   = {() => this.handleChangeOfFocus(null, 0)}
-                                onChange  = {(e) => this.handleCurrentSaleData(e, "QuantityOrPrice")}
+                                id           = "QuantityOrPriceInput" 
+                                type         = "text"
+                                defaultValue = {1}
+                                value        = {this.state.CurrentSell.QuantityOrPrice}
+                                onFocus      = {() => this.handleChangeOfFocus({Position: 0})}
+                                onChange     = {(e) => this.handleChangeSaleData(e, "QuantityOrPriceInput")}
                             />
                             <label htmlFor="QuantityOrPriceInput">
                                 <div style={{fontSize: '0.8em'}}>
@@ -182,8 +200,8 @@ export default class SalesPage extends React.Component {
                                 type      = "text"
                                 autoFocus = {true}
                                 value     = {this.state.CurrentSell.BarCode}
-                                onFocus   = {() => this.handleChangeOfFocus(null, 1)}
-                                onChange  = {(e) => this.handleCurrentSaleData(e, "BarCode")}
+                                onFocus   = {() => this.handleChangeOfFocus({Position: 1})}
+                                onChange  = {(e) => this.handleChangeSaleData(e, "BarCodeInput")}
                             />
                             <label htmlFor="BarCodeInput">Código de Barras del Producto</label>
                         </div>
@@ -196,15 +214,36 @@ export default class SalesPage extends React.Component {
                                 id        = "SearchInput" 
                                 type      = "text"
                                 value     = {this.state.CurrentSell.Search}
-                                onFocus   = {() => this.handleChangeOfFocus(null, 2)}
-                                onChange  = {(e) => this.handleCurrentSaleData(e, "Search")}
+                                onFocus   = {() => this.handleChangeOfFocus({Position: 2})}
+                                onChange  = {(e) => this.handleChangeSaleData(e, "SearchInput")}
                             />
                             <label htmlFor="SearchInput">Buscar por Nombre</label>
                         </div>
 
                     </div>
                     </HotKeys>
+
+                    <Modal 
+                        id          ='ErrorModal' 
+                        header      ='Error' 
+                        fixedFooter = {true} 
+                        style       = {{width: '35%', height: '20rem'}}  
+                        actions     = {
+                            <div>
+                                <Button modal="close" waves="light" className="red lighten-1">
+                                    Cerrar
+                                </Button>
+                            </div>
+                        }
+                    >
+                        <br />
+                        {this.state.ErrorMessage}
+                    </Modal>
+
                 </div>
+
+
+
 
 
                 {/*=====================================================*/}
@@ -228,6 +267,6 @@ export default class SalesPage extends React.Component {
                 </div>
 
             </div>
-        );
+        )
     }
 }
