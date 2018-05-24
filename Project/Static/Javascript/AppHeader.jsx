@@ -1,6 +1,9 @@
 import React from "react";
 
 
+
+
+
 // =====================================================================
 // ============     HEADER COMPONENT       =============================
 // =====================================================================
@@ -11,68 +14,82 @@ export default class AppHeader extends React.Component {
         this.state = {
             value: null,
         };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const Elements = document.querySelectorAll('.sidenav');
+            const Sidenavs = M.Sidenav.init(Elements, {draggable: true, edge: "left"});
+        });
+
     }
 
     render () {
         return (
+            
             <div>
-                {/* NAV BAR FOR DESKTOP */}
+
+                {/*=========================================================*/}
+                {/*================       NAV BAR        ===================*/}
+                {/*=========================================================*/}
                 <div className="navbar-fixed">
                     <nav className="indigo darken-2">
-                        
                         <div className="nav-wrapper container">
                             
-                            {/* NAME OF PAGE */}
-                            <div className="brand-logo white-text" style={{fontSize: '1.5rem'}}>
-                                {/* HOME FOR DESKTOP */}
-                                <a className="hide-on-med-and-down" href="/index.html">
-                                    <i className="material-icons">home</i>
-                                </a>
-                                {/* NAME OF THIS PAGE */}
+                            {/*+++++++++++   NAME OF PAGE   ++++++++++++*/}
+                            <div className="brand-logo white-text center" style={{fontSize: '1.5rem'}}>
                                 {this.props.Page.Name}
                             </div>
 
-                            {/* HOME FOR MOBILE */}
-                            <a href="/MaterializeWebTemplate/Web/" className="brand-logo right hide-on-large-only">
+                            {/*+++++++++++   LINK TO HOME   ++++++++++++*/}
+                            <a href="/index.html" className="brand-logo right">
                                 <i className="material-icons white-text">home</i>
                             </a>
 
-                            {/* Menu for Mobile */}
-                            <a href="#" data-activates="mobile-demo" className="button-collapse">
+                            {/*+++++++++++      MENU       ++++++++++++++*/}
+                            <a href="#" data-target="SideMenu" className="sidenav-trigger show-on-large">
                                 <i className="material-icons white-text">menu</i>
                             </a>
 
-                            {/* Links for Normal Web */}
-                            <ul className="right hide-on-med-and-down">
-                                <li>
-                                    <a className="white-text" href="index.html">
-                                        Home                                
-                                    </a>
-                                </li>
-                            </ul>
                         </div>
                     </nav>
                 </div>
 
-                {/* SIDE BAR FOR MOBILE */}
-                <ul className="side-nav indigo lighten-1" id="mobile-demo">
-                    {/* Links for Mobile Web */}
-                    <br /><br />
-                    <div id="MobileHeaderSideNav">
-                        <h4 className="center-align white-text" style={{fontWeight: 300}}>
-                            <b>{this.props.Page.MiniName}</b> Menu
-                        </h4>
-                    </div>
-                    <br /><br />
-                  
+
+                {/*=========================================================*/}
+                {/*================      SIDE NAV        ===================*/}
+                {/*=========================================================*/}
+                <ul id="SideMenu" className="sidenav">
+                    
                     <li>
-                        <a className="white-text" href="index.html">
-                            <span className="flow-text">
-                                Home                        
-                            </span>
-                        </a>
+                        <div className="user-view">
+                            <div className="container">
+                                <h4 className="white-text" style={{fontWeight: 300}}>
+                                    <b>{this.props.Page.MiniName}</b> Menu
+                                </h4>
+                                
+                                <div className="background">
+                                  <img src="/Distribution/Graphics/BackgroundBlue.jpg" />
+                                </div>
+                                
+                                <a href="#user"><img className="circle" src="/Distribution/Graphics/BackgroundBlue.jpg" /></a>
+                                <a href="#name"><span className="white-text name">John Doe</span></a>
+                                <a href="#email"><span className="white-text email">jdandturk@gmail.com</span></a>
+                            </div>
+                        </div>
                     </li>
+
+
+                    <li><a href="#!"><i className="material-icons">cloud</i>First Link With Icon</a></li>
+                    <li><a href="#!">Second Link</a></li>
+
+                    <li><div className="divider" /></li>
+
+                    <li><a className="subheader">Subheader</a></li>
+                    <li><a className="waves-effect" href="#!">Third Link With Waves</a></li>
                 </ul>
+
+                
+                
+
             </div>
         );
     }

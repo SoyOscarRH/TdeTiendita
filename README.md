@@ -11,8 +11,9 @@
 * CSS3
     * MaterializeCSS 
 * ReactJS
-* npm   
+* npm
 * webpack
+* babel
 
 ### **Back-End**
 * Python3.6
@@ -24,7 +25,7 @@
 
 ### Sales Page
 
-<img src="Graphics/SalesPage1.png" width="70%">
+<img src="Graphics/SalesPage1.png" width="85%">
 
 
 - Autofocus in codebar
@@ -42,4 +43,4 @@
     - To close Dialogs use `esc`
 
 
-<img src="Graphics/SalesPage2.png" width="70%">
+<img src="Graphics/SalesPage2.png" width="85%">

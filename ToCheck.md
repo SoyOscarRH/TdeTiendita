@@ -1,3 +1,7 @@
-## To Check
+## Technologies
 
-- Is the step on the input of QuantityInput in the sales page to sell thing like canela
+- From MySQL to Postgres
+- From Flask to Node
+- How to authentificate a sell in the app 
+- From SQL to prodecures
+- Check invertary in each step

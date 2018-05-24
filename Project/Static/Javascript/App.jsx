@@ -15,6 +15,9 @@ const Pages = {
     }
 }
 
+
+
+
 // =====================================================================
 // ============      APP COMPONENTS        =============================
 // =====================================================================
@@ -23,8 +26,7 @@ export default class App extends React.Component {
         return (
             <div>
                 <header>
-                    <AppHeader Page={Pages.SalesPage}>
-                    </AppHeader>
+                    <AppHeader Page={Pages.SalesPage} />
                 </header>
 
                 <div className="container">
@@ -34,6 +36,7 @@ export default class App extends React.Component {
                             <SalesPage />
                         </div>
                     </div>
+                    
                 </div>
             </div>
         );

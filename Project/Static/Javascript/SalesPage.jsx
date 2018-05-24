@@ -1,12 +1,10 @@
-import React from "react"
-import {HotKeys} from "react-hotkeys"
-import {Modal, Button} from 'react-materialize'
-
-
-
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 // ||||||||||||           SALES PAGE       |||||||||||||||||||||||||||||
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+import React from "react"
+import {HotKeys} from "react-hotkeys"
+import {SentData} from "./CoolFunctions.js"
+
 export default class SalesPage extends React.Component {
 
 
@@ -20,7 +18,7 @@ export default class SalesPage extends React.Component {
             ToPay: 0.0,
             ErrorMessage: "",
             CurrentSell: {
-                QuantityOrPriceInput: "1",
+                QuantityInput: "1",
                 BarCodeInput: " ",
                 SearchInput: " ",
                 IsPrice: false
@@ -28,14 +26,14 @@ export default class SalesPage extends React.Component {
             FocusGroup: {
                 CurrentFocus : 1,
                 FocusElements: [
-                    "QuantityOrPriceInput", 
+                    "QuantityInput", 
                     "BarCodeInput", 
                     "SearchInput"
                 ]
             },
             HotKeysMapping: {
                 keyMap: {
-                    SendProduct:        ['f7', 'enter'],
+                    AddCurrentProduct:  ['enter'],
                     MoveToRight:        ['shift+right', 'alt+right', 'ctrl+right'],
                     MoveToLeft:         ['shift+left',  'alt+left',  'ctrl+left'],
                     SetFocusToQuantity: ['f1', '|', '!', 'space+1'],
@@ -43,30 +41,32 @@ export default class SalesPage extends React.Component {
                     SetFocusToSearch:   ['f3', '#', '·', 'space+3'],
                 },
                 handlers: {
-                    'SendProduct': (e) => this.handleSendProduct(),
-                    'MoveToRight': (e) => this.handleChangeOfFocus({Direction: "right"}),
-                    'MoveToLeft':  (e) => this.handleChangeOfFocus({Direction: "left"}),
+                    'AddCurrentProduct':   (e) => this.handleAddCurrentProduct(),
+                    'MoveToRight':         (e) => this.handleChangeOfFocus({Direction: "right"}),
+                    'MoveToLeft':          (e) => this.handleChangeOfFocus({Direction: "left"}),
                     'SetFocusToQuantity':  (e) => this.handleChangeOfFocus({Position: 0}),
                     'SetFocusToBarCode':   (e) => this.handleChangeOfFocus({Position: 1}),
                     'SetFocusToSearch':    (e) => this.handleChangeOfFocus({Position: 2}),
                 }
             },
             Products: [
-              {
-                Quantity: 1,
-                Name: "Chicles",
-                Code: "3434343434",
-                Price: 0.50,
-              }, 
-              {
-                Quantity: 2,
-                Name: "Malboro",
-                Code: "mal",
-                Price: 7.50,
-              }
+                {
+                    Quantity: 1,
+                    Name: "Chicles",
+                    Code: "3434343434",
+                    Price: 0.50,
+                },
+                {
+                    Quantity: 2,
+                    Name: "Malboro",
+                    Code: "mal",
+                    Price: 7.50,
+                }
             ]
         }
+
     }
+
 
 
     // =========================================================
@@ -100,22 +100,39 @@ export default class SalesPage extends React.Component {
         document.getElementById(NewFocusGroup.FocusElements[NewFocusGroup.CurrentFocus]).focus()
     }
 
-    handleSendProduct () {
+    handleAddCurrentProduct () {
         const Sell = Object.assign({}, this.state.CurrentSell)
-        Sell.IsPrice = Sell.QuantityOrPriceInput[0] === '$'
-        Sell.QuantityOrPriceInput = Number(Sell.QuantityOrPriceInput.slice(Sell.IsPrice? 1: 0))
+        Sell.IsPrice = Sell.QuantityInput[0] === '$'
+        Sell.QuantityInput = Number(Sell.QuantityInput.slice(Sell.IsPrice? 1: 0))
 
-        if (Number.isNaN(Sell.QuantityOrPriceInput)) {
-            let Message = "Error con el Precio dado."
-            Message += "Para salir de este diálogo puedes presionar 'esc'"
+        if (Number.isNaN(Sell.QuantityInput) || Sell.QuantityInput == 0) {
+            let Message = 
+                <div>
+                    <h5> Error con el Precio ó Cantidad </h5>
+                    <br />
+                    Para salir de este diálogo puedes presionar la tecla 'esc'
+                </div>
+
             this.setState({ErrorMessage: Message})
-            $('#ErrorModal').modal('open')
+
+            const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'));
+            InstanceModal.open()
+
             return
         }
-        else {
-            console.log(Sell)
-        }
 
+        this.setState({CurrentSell: Sell})
+
+        SentData('/CheckPrice', Sell)
+        .then(Data => console.log(Data))
+        .catch(error => console.log(error))
+    }
+
+    componentDidMount() {
+        const Instances = M.Modal.init(document.getElementById('ErrorModal'), {
+            dismissible: true,
+            onCloseEnd: () => this.handleChangeOfFocus({Position: 0})
+        });
     }
 
 
@@ -138,6 +155,7 @@ export default class SalesPage extends React.Component {
         return (
             <div className="card-panel blue-grey lighten-5 black-text">
                 
+
                 {/*=====================================================*/}
                 {/*==============     HEADER TO PAY ====================*/}
                 {/*=====================================================*/}
@@ -160,90 +178,94 @@ export default class SalesPage extends React.Component {
                     </div>
                 </div>
 
-
                 {/*=====================================================*/}
                 {/*=========    SELECTOR FOR NEW PRODUCT    ============*/}
                 {/*=====================================================*/}
                 <div className="divider" />
                 <div className="section">
 
+                    {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                    {/*+++++++++            MODALS              ++++++++++++*/}
+                    {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                     <HotKeys 
                         keyMap   = {this.state.HotKeysMapping.keyMap} 
                         handlers = {this.state.HotKeysMapping.handlers}>
-                    <div className="row">
-                      
-                        {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                        {/*+++++++++    QUANTITY OR PRICE INPUT     ++++++++++++*/}
-                        {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                        <div className="input-field col s2">
-                            <input 
-                                id           = "QuantityOrPriceInput" 
-                                type         = "text"
-                                defaultValue = {1}
-                                value        = {this.state.CurrentSell.QuantityOrPrice}
-                                onFocus      = {() => this.handleChangeOfFocus({Position: 0})}
-                                onChange     = {(e) => this.handleChangeSaleData(e, "QuantityOrPriceInput")}
-                            />
-                            <label htmlFor="QuantityOrPriceInput">
-                                <div style={{fontSize: '0.8em'}}>
-                                    Cantidad o Precio
-                                </div>
-                            </label>
+
+                        <div className="row">
+                          
+                            {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                            {/*+++++++++    QUANTITY OR PRICE INPUT     ++++++++++++*/}
+                            {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                            <div className="input-field col s2">
+                                <input 
+                                    id           = "QuantityInput" 
+                                    type         = "text"
+                                    defaultValue = {1}
+                                    value        = {this.state.CurrentSell.QuantityOrPrice}
+                                    onFocus      = {() => this.handleChangeOfFocus({Position: 0})}
+                                    onChange     = {(e) => this.handleChangeSaleData(e, "QuantityInput")}
+                                />
+                                <label htmlFor="QuantityInput">
+                                    <div style={{fontSize: '0.8em'}}>
+                                        Cantidad o Precio
+                                    </div>
+                                </label>
+                            </div>
+
+                            {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                            {/*+++++++++          BAR CODE INPUT        ++++++++++++*/}
+                            {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                            <div className="input-field col s5">
+                                <input 
+                                    id        = "BarCodeInput" 
+                                    type      = "text"
+                                    autoFocus = {true}
+                                    value     = {this.state.CurrentSell.BarCode}
+                                    onFocus   = {() => this.handleChangeOfFocus({Position: 1})}
+                                    onChange  = {(e) => this.handleChangeSaleData(e, "BarCodeInput")}
+                                />
+                                <label htmlFor="BarCodeInput">Código de Barras del Producto</label>
+                            </div>
+
+                            {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                            {/*+++++++++         SEARCH INPUT           ++++++++++++*/}
+                            {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                            <div className="input-field col s5">
+                                <input 
+                                    id        = "SearchInput" 
+                                    type      = "text"
+                                    value     = {this.state.CurrentSell.Search}
+                                    onFocus   = {() => this.handleChangeOfFocus({Position: 2})}
+                                    onChange  = {(e) => this.handleChangeSaleData(e, "SearchInput")}
+                                />
+                                <label htmlFor="SearchInput">Buscar por Nombre</label>
+                            </div>
+
                         </div>
 
-                        {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                        {/*+++++++++          BAR CODE INPUT        ++++++++++++*/}
-                        {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                        <div className="input-field col s5">
-                            <input 
-                                id        = "BarCodeInput" 
-                                type      = "text"
-                                autoFocus = {true}
-                                value     = {this.state.CurrentSell.BarCode}
-                                onFocus   = {() => this.handleChangeOfFocus({Position: 1})}
-                                onChange  = {(e) => this.handleChangeSaleData(e, "BarCodeInput")}
-                            />
-                            <label htmlFor="BarCodeInput">Código de Barras del Producto</label>
-                        </div>
-
-                        {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                        {/*+++++++++         SEARCH INPUT           ++++++++++++*/}
-                        {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                        <div className="input-field col s5">
-                            <input 
-                                id        = "SearchInput" 
-                                type      = "text"
-                                value     = {this.state.CurrentSell.Search}
-                                onFocus   = {() => this.handleChangeOfFocus({Position: 2})}
-                                onChange  = {(e) => this.handleChangeSaleData(e, "SearchInput")}
-                            />
-                            <label htmlFor="SearchInput">Buscar por Nombre</label>
-                        </div>
-
-                    </div>
                     </HotKeys>
 
-                    <Modal 
-                        id          ='ErrorModal' 
-                        header      ='Error' 
-                        fixedFooter = {true} 
-                        style       = {{width: '35%', height: '20rem'}}  
-                        actions     = {
-                            <div>
-                                <Button modal="close" waves="light" className="red lighten-1">
-                                    Cerrar
-                                </Button>
-                            </div>
-                        }
-                    >
-                        <br />
-                        {this.state.ErrorMessage}
-                    </Modal>
+                    {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                    {/*+++++++++          ERROR MODAL           ++++++++++++*/}
+                    {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                    <div 
+                        id        = "ErrorModal"
+                        className = "modal modal-fixed-footer"
+                        style     = {{width: '45%', height: '20rem'}} >
+                        
+                        <div className="modal-content">
+                            <h4>Error</h4>
+                            {this.state.ErrorMessage}
+                        </div>
+
+                        <div className="modal-footer">
+                            <a className="btn-flat modal-close waves-effect waves-red red lighten-2">
+                                <span className="white-text">Salir</span>
+                            </a>
+                        </div>
+                    </div>
 
                 </div>
-
-
-
 
 
                 {/*=====================================================*/}
