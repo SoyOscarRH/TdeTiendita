@@ -1,12 +1,16 @@
-#=============================================================
-#================       SERVER       =========================
-#=============================================================
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#|||||||||||||||||||||||           SALES PAGE       ||||||||||||||||||||||||||||||||||||||||
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 from flask import Flask, render_template, request, json
 import pymysql.cursors
 
-#=============================================================
-#=====     START AND CONFIGURE THE WEB APP     ===============
-#=============================================================
+#==========================================================================
+#=================     START AND CONFIGURE THE WEB APP     ================
+#==========================================================================
+
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++          FLASK APP          ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
 WebApp = Flask(
             __name__, 
             static_folder = "../Static/Distribution", 
@@ -17,9 +21,9 @@ WebApp.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 WebApp.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
-#=============================================================
-#=====           DATABASE CONFIGURATION        ===============
-#=============================================================
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++     DATABASE CONFIGURATION  ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
 Connection = pymysql.connect(
     host     = 'localhost',
     user     = 'root',
@@ -28,31 +32,43 @@ Connection = pymysql.connect(
 )
 
 
-#=============================================================
-#================           ROUTES      ======================
-#=============================================================
+#==========================================================================
+#======================         ROUTES           ==========================
+#==========================================================================
 
-#=================================================
-#==========     ROUT: INDEX       ================
-#=================================================
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++          ROUT: INDEX        ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
 @WebApp.route("/")
 def index():
     return render_template("index.html")
 
-#=================================================
-#==========     ROUT: HELLO       ================
-#=================================================
-@WebApp.route("/CheckPrice", methods=['POST'])
-def CheckPrice():
-    Name = request.json['BarCodeInput']
+
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++    DATA FROM BAR CODE       ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
+@WebApp.route("/DataFromBarCode", methods=['POST'])
+def DataFromBarCode():
+    
+    BarCode = request.json['BarCodeInput']
 
     with Connection.cursor() as Cursor:
-        sql = "SELECT Price from Product WHERE CodeBar = %s"
-        Cursor.execute(sql, Name)
-        result = Cursor.fetchone()
-        print(f"Result: {result}")
+        SQLQuery = "SELECT Price, Name from Product WHERE CodeBar = %s"
+        Cursor.execute(SQLQuery, BarCode)
+        Results = Cursor.fetchone()
 
-    return json.dumps({"Name": "All ok :D"})
+        if Results == None: 
+            return json.dumps({
+                "Error": f"No hay producto con código de barras {BarCode}"
+            })
+        else:
+            return json.dumps({"UnitPrice": Results[0], "BarCode": BarCode, "Name": Results[1]})
+
+
+
+
+
+
 
 
 #=============================================================

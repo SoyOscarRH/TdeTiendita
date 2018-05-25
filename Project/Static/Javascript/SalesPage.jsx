@@ -36,9 +36,9 @@ export default class SalesPage extends React.Component {
                     AddCurrentProduct:  ['enter'],
                     MoveToRight:        ['shift+right', 'alt+right', 'ctrl+right'],
                     MoveToLeft:         ['shift+left',  'alt+left',  'ctrl+left'],
-                    SetFocusToQuantity: ['f1', '|', '!', 'space+1'],
-                    SetFocusToBarCode:  ['f2', '@', '"', 'space+2'],
-                    SetFocusToSearch:   ['f3', '#', '·', 'space+3'],
+                    SetFocusToQuantity: ['f1', '|', '!'],
+                    SetFocusToBarCode:  ['f2', '@', '"'],
+                    SetFocusToSearch:   ['f3', '#', '·'],
                 },
                 handlers: {
                     'AddCurrentProduct':   (e) => this.handleAddCurrentProduct(),
@@ -49,21 +49,12 @@ export default class SalesPage extends React.Component {
                     'SetFocusToSearch':    (e) => this.handleChangeOfFocus({Position: 2}),
                 }
             },
-            Products: [
-                {
-                    Quantity: 1,
-                    Name: "Chicles",
-                    Code: "3434343434",
-                    Price: 0.50,
-                },
-                {
-                    Quantity: 2,
-                    Name: "Malboro",
-                    Code: "mal",
-                    Price: 7.50,
-                }
-            ]
+            Products: []
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            M.Modal.init(document.getElementById('ErrorModal'), {dismissible: true})
+        })
 
     }
 
@@ -101,38 +92,104 @@ export default class SalesPage extends React.Component {
     }
 
     handleAddCurrentProduct () {
+
         const Sell = Object.assign({}, this.state.CurrentSell)
-        Sell.IsPrice = Sell.QuantityInput[0] === '$'
-        Sell.QuantityInput = Number(Sell.QuantityInput.slice(Sell.IsPrice? 1: 0))
 
-        if (Number.isNaN(Sell.QuantityInput) || Sell.QuantityInput == 0) {
-            let Message = 
-                <div>
-                    <h5> Error con el Precio ó Cantidad </h5>
-                    <br />
-                    Para salir de este diálogo puedes presionar la tecla 'esc'
-                </div>
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++      CHECK IF IS QUANTITY OR PRICE     ++++++++++
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-            this.setState({ErrorMessage: Message})
+            Sell.IsPrice = Sell.QuantityInput[0] === '$'
+            Sell.QuantityInput = Number(Sell.QuantityInput.slice(Sell.IsPrice? 1: 0))
 
-            const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'));
-            InstanceModal.open()
+            if (Number.isNaN(Sell.QuantityInput) || Sell.QuantityInput <= 0) {
+                let Message = (
+                    <div>
+                        <h5> Error con el Precio ó Cantidad </h5>
+                        <br />
+                        Para salir de este diálogo puedes presionar la tecla 'esc'
+                    </div>
+                )
 
-            return
-        }
+                this.setState({ErrorMessage: Message})
 
-        this.setState({CurrentSell: Sell})
+                const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
 
-        SentData('/CheckPrice', Sell)
-        .then(Data => console.log(Data))
-        .catch(error => console.log(error))
-    }
+                InstanceModal.options.onCloseEnd = () => this.handleChangeOfFocus({Position: 0}) 
+                InstanceModal.open()
 
-    componentDidMount() {
-        const Instances = M.Modal.init(document.getElementById('ErrorModal'), {
-            dismissible: true,
-            onCloseEnd: () => this.handleChangeOfFocus({Position: 0})
-        });
+                return
+            }
+
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++     SEND TO FIND THE PRICE AND NAME     +++++++++
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        SentData('/DataFromBarCode', Sell)
+        .then(Results => {
+
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            // ++++++          IF NOT FIND        +++++++++
+            // ++++++++++++++++++++++++++++++++++++++++++++
+                if (Results['Error'] != undefined) {
+
+                    this.setState({ErrorMessage:  (
+                            <div>
+                                <h5> Error con el Producto </h5>
+                                <br />
+                                {Results['Error']}
+                            </div>
+                        )
+                    })
+
+                    const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
+                    InstanceModal.options.onCloseEnd = () => this.handleChangeOfFocus({Position: 1}) 
+                    InstanceModal.open()
+
+                    return
+                }
+
+            
+            const Products = [...this.state.Products]
+            const NewQuantity = (Sell.IsPrice)? 
+                Sell.QuantityInput / Results['UnitPrice']:
+                Sell.QuantityInput
+
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            // ++    WE HAVE THE PRODUCT IN THE LIST?    ++
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            const ExistAlready = Products.some(
+                (Product) => {
+                    if (Product['Code'] === Results['BarCode']) {
+                        Product['Quantity'] = String(Number(NewQuantity) + Number(Product['Quantity']))
+                        return true
+                    }
+                    return false
+                }
+            )
+
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            // +++++    CREATE NEW ITEM IN TABLE   ++++++++
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            if (!ExistAlready) {
+                Products.unshift({
+                    "Quantity":  String(NewQuantity),
+                    "Name":      Results['Name'],
+                    "Code":      Results['BarCode'],
+                    "UnitPrice": Results['UnitPrice']
+                })
+            }
+
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            // ++++   SET THE STATE AS IT SHOULD   ++++++++
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            Sell.QuantityInput = "1"
+            this.handleChangeOfFocus({Position: 1})
+            this.setState({"Products": Products})
+            this.setState({"CurrentSell": Sell})
+
+        })
+        .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
     }
 
 
@@ -145,9 +202,10 @@ export default class SalesPage extends React.Component {
 
             return (
                 <tr key={Product.Code}>
-                    <td>{Product.Quantity}</td>
+                    <td>{Number(Product.Quantity).toFixed(3)}</td>
                     <td>{Product.Name}</td>
-                    <td>${Product.Price.toFixed(2)}</td>
+                    <td>${Product.UnitPrice.toFixed(2)}</td>
+                    <td>${(Product.UnitPrice * Product.Quantity).toFixed(2)}</td>
                 </tr>
             )
         })
@@ -200,8 +258,7 @@ export default class SalesPage extends React.Component {
                                 <input 
                                     id           = "QuantityInput" 
                                     type         = "text"
-                                    defaultValue = {1}
-                                    value        = {this.state.CurrentSell.QuantityOrPrice}
+                                    value        = {this.state.CurrentSell.QuantityInput}
                                     onFocus      = {() => this.handleChangeOfFocus({Position: 0})}
                                     onChange     = {(e) => this.handleChangeSaleData(e, "QuantityInput")}
                                 />
@@ -278,7 +335,8 @@ export default class SalesPage extends React.Component {
                             <tr>
                                 <th>Cantidad</th>
                                 <th>Producto</th>
-                                <th>Precio</th>
+                                <th>Precio Unitario</th>
+                                <th>SubTotal</th>
                             </tr>
                         </thead>
 
