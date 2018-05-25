@@ -19,8 +19,8 @@ export default class SalesPage extends React.Component {
             ErrorMessage: "",
             CurrentSell: {
                 QuantityInput: "1",
-                BarCodeInput: " ",
-                SearchInput: " ",
+                BarCodeInput: "",
+                SearchInput: "",
                 IsPrice: false
             },
             FocusGroup: {
@@ -44,9 +44,9 @@ export default class SalesPage extends React.Component {
                     'AddCurrentProduct':   (e) => this.handleAddCurrentProduct(),
                     'MoveToRight':         (e) => this.handleChangeOfFocus({Direction: "right"}),
                     'MoveToLeft':          (e) => this.handleChangeOfFocus({Direction: "left"}),
-                    'SetFocusToQuantity':  (e) => this.handleChangeOfFocus({Position: 0}),
-                    'SetFocusToBarCode':   (e) => this.handleChangeOfFocus({Position: 1}),
-                    'SetFocusToSearch':    (e) => this.handleChangeOfFocus({Position: 2}),
+                    'SetFocusToQuantity':  (e) => this.handleChangeOfFocus({Position: "QuantityInput"}),
+                    'SetFocusToBarCode':   (e) => this.handleChangeOfFocus({Position: "BarCodeInput"}),
+                    'SetFocusToSearch':    (e) => this.handleChangeOfFocus({Position: "SearchInput"}),
                 }
             },
             Products: []
@@ -76,8 +76,10 @@ export default class SalesPage extends React.Component {
         const NewFocusGroup = Object.assign({}, this.state.FocusGroup)
         let NewCurrentFocus = 0
 
-        if (Parameters['Direction'] == undefined) {
-            NewCurrentFocus = Parameters['Position']
+        if (Parameters['Position'] != undefined) {
+            if (Parameters['Position'] == "QuantityInput") NewCurrentFocus = 0
+            if (Parameters['Position'] == "BarCodeInput")  NewCurrentFocus = 1
+            if (Parameters['Position'] == "SearchInput")   NewCurrentFocus = 2
         }
         else {
             const Move = (Parameters['Direction'] === "right")? 1: -1
@@ -115,7 +117,7 @@ export default class SalesPage extends React.Component {
 
                 const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
 
-                InstanceModal.options.onCloseEnd = () => this.handleChangeOfFocus({Position: 0}) 
+                InstanceModal.options.onCloseEnd = () => this.handleChangeOfFocus({Position: "QuantityInput"}) 
                 InstanceModal.open()
 
                 return
@@ -143,8 +145,15 @@ export default class SalesPage extends React.Component {
                     })
 
                     const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
-                    InstanceModal.options.onCloseEnd = () => this.handleChangeOfFocus({Position: 1}) 
+                    InstanceModal.options.onCloseEnd = () => this.handleChangeOfFocus({Position: "BarCodeInput"}) 
                     InstanceModal.open()
+
+                    // ++++++++++++++++++++++++++++++++++++++++++++
+                    // ++++   SET THE STATE AS IT SHOULD   ++++++++
+                    // ++++++++++++++++++++++++++++++++++++++++++++
+                    Sell.BarCodeInput = ""
+                    Sell.QuantityInput = String(Sell.QuantityInput)
+                    this.setState({"CurrentSell": Sell})
 
                     return
                 }
@@ -184,9 +193,10 @@ export default class SalesPage extends React.Component {
             // ++++   SET THE STATE AS IT SHOULD   ++++++++
             // ++++++++++++++++++++++++++++++++++++++++++++
             Sell.QuantityInput = "1"
-            this.handleChangeOfFocus({Position: 1})
-            this.setState({"Products": Products})
-            this.setState({"CurrentSell": Sell})
+            Sell.BarCodeInput = ""
+            this.handleChangeOfFocus({Position: "BarCodeInput"})
+
+            this.setState({"Products": Products, "CurrentSell": Sell})
 
         })
         .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
@@ -200,12 +210,15 @@ export default class SalesPage extends React.Component {
 
         const TableProductsItems = this.state.Products.map( (Product) => {
 
+            let VisualQuantity = Number(Product.Quantity)
+            if (!Number.isInteger(VisualQuantity)) VisualQuantity = VisualQuantity.toFixed(3)
+            
             return (
                 <tr key={Product.Code}>
-                    <td>{Number(Product.Quantity).toFixed(3)}</td>
-                    <td>{Product.Name}</td>
-                    <td>${Product.UnitPrice.toFixed(2)}</td>
-                    <td>${(Product.UnitPrice * Product.Quantity).toFixed(2)}</td>
+                    <td>  {VisualQuantity}                                      </td>
+                    <td>  {Product.Name}                                        </td>
+                    <td>$ {Product.UnitPrice.toFixed(2)}                        </td>
+                    <td>$ {(Product.UnitPrice * Product.Quantity).toFixed(2)}   </td>
                 </tr>
             )
         })
@@ -259,7 +272,7 @@ export default class SalesPage extends React.Component {
                                     id           = "QuantityInput" 
                                     type         = "text"
                                     value        = {this.state.CurrentSell.QuantityInput}
-                                    onFocus      = {() => this.handleChangeOfFocus({Position: 0})}
+                                    onFocus      = {() => this.handleChangeOfFocus({Position: "QuantityInput"})}
                                     onChange     = {(e) => this.handleChangeSaleData(e, "QuantityInput")}
                                 />
                                 <label htmlFor="QuantityInput">
@@ -277,8 +290,8 @@ export default class SalesPage extends React.Component {
                                     id        = "BarCodeInput" 
                                     type      = "text"
                                     autoFocus = {true}
-                                    value     = {this.state.CurrentSell.BarCode}
-                                    onFocus   = {() => this.handleChangeOfFocus({Position: 1})}
+                                    value     = {this.state.CurrentSell.BarCodeInput}
+                                    onFocus   = {() => this.handleChangeOfFocus({Position: "BarCodeInput"})}
                                     onChange  = {(e) => this.handleChangeSaleData(e, "BarCodeInput")}
                                 />
                                 <label htmlFor="BarCodeInput">Código de Barras del Producto</label>
@@ -291,8 +304,8 @@ export default class SalesPage extends React.Component {
                                 <input 
                                     id        = "SearchInput" 
                                     type      = "text"
-                                    value     = {this.state.CurrentSell.Search}
-                                    onFocus   = {() => this.handleChangeOfFocus({Position: 2})}
+                                    value     = {this.state.CurrentSell.SearchInput}
+                                    onFocus   = {() => this.handleChangeOfFocus({Position: "SearchInput"})}
                                     onChange  = {(e) => this.handleChangeSaleData(e, "SearchInput")}
                                 />
                                 <label htmlFor="SearchInput">Buscar por Nombre</label>

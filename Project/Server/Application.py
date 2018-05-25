@@ -50,7 +50,7 @@ def index():
 @WebApp.route("/DataFromBarCode", methods=['POST'])
 def DataFromBarCode():
     
-    BarCode = request.json['BarCodeInput']
+    BarCode = request.json['BarCodeInput'].strip()
 
     with Connection.cursor() as Cursor:
         SQLQuery = "SELECT Price, Name from Product WHERE CodeBar = %s"
