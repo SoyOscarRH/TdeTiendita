@@ -126,7 +126,6 @@ export default class SalesPage extends React.Component {
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // ++++++     SEND TO FIND THE PRICE AND NAME     +++++++++
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
         SentData('/DataFromBarCode', Sell)
         .then(Results => {
 
@@ -167,6 +166,9 @@ export default class SalesPage extends React.Component {
             // ++++++++++++++++++++++++++++++++++++++++++++
             // ++    WE HAVE THE PRODUCT IN THE LIST?    ++
             // ++++++++++++++++++++++++++++++++++++++++++++
+
+            const NewToPay = this.state.ToPay + (Results['UnitPrice'] * NewQuantity)
+
             const ExistAlready = Products.some(
                 (Product) => {
                     if (Product['Code'] === Results['BarCode']) {
@@ -195,8 +197,7 @@ export default class SalesPage extends React.Component {
             Sell.QuantityInput = "1"
             Sell.BarCodeInput = ""
             this.handleChangeOfFocus({Position: "BarCodeInput"})
-
-            this.setState({"Products": Products, "CurrentSell": Sell})
+            this.setState({"Products": Products, "CurrentSell": Sell, "ToPay": NewToPay})
 
         })
         .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
@@ -219,6 +220,11 @@ export default class SalesPage extends React.Component {
                     <td>  {Product.Name}                                        </td>
                     <td>$ {Product.UnitPrice.toFixed(2)}                        </td>
                     <td>$ {(Product.UnitPrice * Product.Quantity).toFixed(2)}   </td>
+                    <td>
+                        <a class="waves-effect waves-light btn-flat red lighten-1">
+                            <i class="white-text material-icons">delete</i>
+                        </a>
+                    </td>
                 </tr>
             )
         })
@@ -230,23 +236,46 @@ export default class SalesPage extends React.Component {
                 {/*=====================================================*/}
                 {/*==============     HEADER TO PAY ====================*/}
                 {/*=====================================================*/}
-                <div className="row section">
-                    <div className="input-field col s7 offset-s1 center-align valign-wrapper">
-                        <span 
-                            className="hide-on-small-only" 
-                            style={{fontWeight: 300, fontSize: '2rem'}}>
-                            
-                            Por Pagar: &nbsp;&nbsp;
-                        
-                        </span>
-                        <span style={{fontWeight: 600, fontSize: '2rem'}}>
-                            ${this.state.ToPay.toFixed(2)}
-                        </span>
+                <div className="section grey-text text-darken-3">
+
+                    <div className="hide-on-small-only">
+                        <div className="row">
+                            <div className="input-field col s7 offset-s1 center-align valign-wrapper">
+                                <span 
+                                    style={{fontWeight: 300, fontSize: '2rem'}}>
+                                    Por Pagar: &nbsp;&nbsp;
+                                </span>
+                                <span style={{fontWeight: 600, fontSize: '2rem'}}>
+                                    ${this.state.ToPay.toFixed(2)}
+                                </span>
+                            </div>
+
+                            <div className="s4">
+                                <a className="waves-effect waves-light btn-large">Pagar</a>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="s4">
-                        <a className="waves-effect waves-light btn-large">Pagar</a>
+                    <div className="hide-on-med-and-up">
+                        <div className="row container">
+                           <span
+                                className = "s5" 
+                                style={{fontWeight: 300, fontSize: '2rem'}}>
+                                Pagar: &nbsp;&nbsp;
+                            </span>
+                           <span
+                                className = "s7" 
+                                style={{fontWeight: 600, fontSize: '2rem'}}>
+                                ${this.state.ToPay.toFixed(2)}
+                            </span>
+                        </div>
+                        <div className="row">
+                            <div className="s10 offset-s1">
+                                <a className="waves-effect waves-light btn-large">Pagar</a>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
 
                 {/*=====================================================*/}
@@ -276,9 +305,13 @@ export default class SalesPage extends React.Component {
                                     onChange     = {(e) => this.handleChangeSaleData(e, "QuantityInput")}
                                 />
                                 <label htmlFor="QuantityInput">
-                                    <div style={{fontSize: '0.8em'}}>
-                                        Cantidad o Precio
-                                    </div>
+                                    <span style={{fontSize: '0.8em'}}>
+                                        Cantidad
+                                    </span>
+                                    &nbsp;
+                                    <span className="hide-on-med-and-down"  style={{fontSize: '0.8em'}}>
+                                        o Precio
+                                    </span>
                                 </label>
                             </div>
 
@@ -294,7 +327,15 @@ export default class SalesPage extends React.Component {
                                     onFocus   = {() => this.handleChangeOfFocus({Position: "BarCodeInput"})}
                                     onChange  = {(e) => this.handleChangeSaleData(e, "BarCodeInput")}
                                 />
-                                <label htmlFor="BarCodeInput">Código de Barras del Producto</label>
+                                <label htmlFor="BarCodeInput">
+                                    <span>
+                                        Código
+                                    </span>
+                                    &nbsp;
+                                    <span className="hide-on-small-only">
+                                        de Barras
+                                    </span>
+                                </label>
                             </div>
 
                             {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
@@ -308,7 +349,15 @@ export default class SalesPage extends React.Component {
                                     onFocus   = {() => this.handleChangeOfFocus({Position: "SearchInput"})}
                                     onChange  = {(e) => this.handleChangeSaleData(e, "SearchInput")}
                                 />
-                                <label htmlFor="SearchInput">Buscar por Nombre</label>
+                                <label htmlFor="SearchInput">
+                                    <span>
+                                        Buscar
+                                    </span>
+                                    &nbsp;
+                                    <span className="hide-on-small-only">
+                                        por Nombre
+                                    </span>
+                                </label>
                             </div>
 
                         </div>
@@ -350,6 +399,7 @@ export default class SalesPage extends React.Component {
                                 <th>Producto</th>
                                 <th>Precio Unitario</th>
                                 <th>SubTotal</th>
+                                <th>Eliminar</th>
                             </tr>
                         </thead>
 

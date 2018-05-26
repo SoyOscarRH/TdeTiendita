@@ -6,8 +6,8 @@ import SalesPage from "./SalesPage"
 
 const Pages = {
     SalesPage: {
-        Name: "Sales Page",
-        MiniName: "Sales",
+        Name: "Página de Ventas",
+        MiniName: "Ventas",
         Links: [
             ["Home", ".... :0"],
         ]

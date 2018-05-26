@@ -34,12 +34,12 @@
 - You have a ton of Hot Keys:
 	- MoveFocusToRight: with `shift+right` or `alt+right` or `ctrl+right`
 	- MoveFocusToLeft: with `shift+left` or `alt+left` or `ctrl+left`
-    - SendProduct: with `f7` or `enter`
+    - SendProduct: with `enter`
     - MoveToRight: with `shift+right` or `alt+right` or `ctrl+right`
     - MoveToLeft: with `shift+left` or  `alt+left` or  `ctrl+left`
-    - SetFocusToQuantity: with `f1` or `alt+1` or `shift+1` or `space+1`
-    - SetFocusToBarCode:  with `f2` or `alt+2` or `shift+2` or `space+2`
-    - SetFocusToSearch:   with `f3` or `alt+3` or `shift+3` or `space+3`
+    - SetFocusToQuantity: with `f1` or `alt+1` or `shift+1`
+    - SetFocusToBarCode:  with `f2` or `alt+2` or `shift+2`
+    - SetFocusToSearch:   with `f3` or `alt+3` or `shift+3`
     - To close Dialogs use `esc`
 
 
