@@ -151,7 +151,7 @@ export default class SalesPage extends React.Component {
                     // ++++   SET THE STATE AS IT SHOULD   ++++++++
                     // ++++++++++++++++++++++++++++++++++++++++++++
                     Sell.BarCodeInput = ""
-                    Sell.QuantityInput = String(Sell.QuantityInput)
+                    Sell.QuantityInput = Sell.IsPrice? "$" + String(Sell.QuantityInput): String(Sell.QuantityInput)
                     this.setState({"CurrentSell": Sell})
 
                     return
@@ -213,7 +213,13 @@ export default class SalesPage extends React.Component {
 
             let VisualQuantity = Number(Product.Quantity)
             if (!Number.isInteger(VisualQuantity)) VisualQuantity = VisualQuantity.toFixed(3)
-            
+
+            const DeleteItem = (Product) => {
+                const NewProducts = this.state.Products.filter(Item => Item.Code !== Product.Code)
+                const NewToPay = this.state.ToPay - (Product.UnitPrice * Product.Quantity)
+                this.setState({"Products": NewProducts, "ToPay": NewToPay})
+            }
+
             return (
                 <tr key={Product.Code}>
                     <td>  {VisualQuantity}                                      </td>
@@ -221,8 +227,10 @@ export default class SalesPage extends React.Component {
                     <td>$ {Product.UnitPrice.toFixed(2)}                        </td>
                     <td>$ {(Product.UnitPrice * Product.Quantity).toFixed(2)}   </td>
                     <td>
-                        <a class="waves-effect waves-light btn-flat red lighten-1">
-                            <i class="white-text material-icons">delete</i>
+                        <a 
+                            onClick   = {() => DeleteItem(Product)}
+                            className = "waves-effect waves-light btn-flat red lighten-1">
+                            <i className="white-text material-icons">close</i>
                         </a>
                     </td>
                 </tr>
