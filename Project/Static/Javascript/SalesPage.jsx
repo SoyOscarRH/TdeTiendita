@@ -66,38 +66,37 @@ export default class SalesPage extends React.Component {
     // =========================================================
     // ===========              HANDLES            =============
     // =========================================================
-    handleChangeSaleData (Event, Item) {
-        const NewCurrentSell = Object.assign({}, this.state.CurrentSell)
-        const NewFocusGroup = Object.assign({}, this.state.FocusGroup)
-        
-        NewCurrentSell[Item] = Event.target.value
-        NewFocusGroup.CurrentFocus = NewFocusGroup.FocusElements.findIndex(name => name === Item)
-        this.setState({CurrentSell: NewCurrentSell, FocusGroup: NewFocusGroup})
+    handleChangeSaleData (NewValue, Item) {
+        this.setState((PrevState) => {
+            const NewCurrentSell = PrevState.CurrentSell
+            const NewFocusGroup = PrevState.FocusGroup
+            
+            NewCurrentSell[Item] = NewValue
+            NewFocusGroup.CurrentFocus = NewFocusGroup.FocusElements.findIndex(name => name === Item)
+            
+            return {CurrentSell: NewCurrentSell, FocusGroup: NewFocusGroup}
+        })
     }
 
 
     handleChangeOfFocus (Parameters) {
-        this.setState((PrevState) => {
-            const NewFocusGroup = PrevState.FocusGroup
-            let NewCurrentFocus = 0
+        const NewFocusGroup = Object.assign({}, this.state.FocusGroup)
+        let NewCurrentFocus = 0
 
-            if (Parameters['Position'] != undefined) {
-                if (Parameters['Position'] == "QuantityInput") NewCurrentFocus = 0
-                if (Parameters['Position'] == "BarCodeInput")  NewCurrentFocus = 1
-                if (Parameters['Position'] == "SearchInput")   NewCurrentFocus = 2
-            }
-            else {
-                const Move = (Parameters['Direction'] === "right")? 1: -1
-                NewCurrentFocus = (NewFocusGroup.CurrentFocus + Move) % 3
-                if (NewCurrentFocus < 0) NewCurrentFocus += 3
-            }
+        if (Parameters['Position'] != undefined) {
+            if (Parameters['Position'] == "QuantityInput") NewCurrentFocus = 0
+            if (Parameters['Position'] == "BarCodeInput")  NewCurrentFocus = 1
+            if (Parameters['Position'] == "SearchInput")   NewCurrentFocus = 2
+        }
+        else {
+            const Move = (Parameters['Direction'] === "right")? 1: -1
+            NewCurrentFocus = (NewFocusGroup.CurrentFocus + Move) % 3
+            if (NewCurrentFocus < 0) NewCurrentFocus += 3
+        }
 
-            document.getElementById(NewFocusGroup.FocusElements[NewCurrentFocus]).focus()
-            PrevState.FocusGroup.CurrentFocus = NewCurrentFocus
-
-            return {"FocusGroup": NewFocusGroup}
-        })
-
+        NewFocusGroup.CurrentFocus = NewCurrentFocus
+        this.setState({FocusGroup: NewFocusGroup})
+        document.getElementById(NewFocusGroup.FocusElements[NewFocusGroup.CurrentFocus]).focus()
     }
 
     handleAddCurrentProduct () {
@@ -493,7 +492,3 @@ function ProductsTable(props) {
         </div>
     )
 }
-
-
-
-
