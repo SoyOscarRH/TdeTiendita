@@ -7,7 +7,6 @@ import {SentData} from "./CoolFunctions.js"
 
 export default class SalesPage extends React.Component {
 
-
     // =========================================================
     // ========        CONSTRUCTOR AND STATE         ===========
     // =========================================================
@@ -53,11 +52,9 @@ export default class SalesPage extends React.Component {
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            M.Modal.init(document.getElementById('ErrorModal'), {dismissible: true})
+            M.Modal.init(document.getElementById('ErrorModal'), {dismissible: true, inDuration: 80, outDuration: 80})
         })
-
     }
-
 
 
     // =========================================================
@@ -107,9 +104,9 @@ export default class SalesPage extends React.Component {
             if (Number.isNaN(Sell.QuantityInput) || Sell.QuantityInput <= 0) {
                 let Message = (
                     <div>
-                        <h5> Error con el Precio ó Cantidad </h5>
+                        <h5> Error con el Precio ó Cantidad</h5>
                         <br />
-                        Para salir de este diálogo puedes presionar la tecla 'esc'
+                            Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
                     </div>
                 )
 
@@ -139,6 +136,10 @@ export default class SalesPage extends React.Component {
                                 <h5> Error con el Producto </h5>
                                 <br />
                                 {Results['Error']}
+                                <br />
+                                <div>
+                                    Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
+                                </div>
                             </div>
                         )
                     })
@@ -151,6 +152,7 @@ export default class SalesPage extends React.Component {
                     // ++++   SET THE STATE AS IT SHOULD   ++++++++
                     // ++++++++++++++++++++++++++++++++++++++++++++
                     Sell.BarCodeInput = ""
+                    Sell.SearchInput = ""
                     Sell.QuantityInput = Sell.IsPrice? "$" + String(Sell.QuantityInput): String(Sell.QuantityInput)
                     this.setState({"CurrentSell": Sell})
 
@@ -196,6 +198,7 @@ export default class SalesPage extends React.Component {
             // ++++++++++++++++++++++++++++++++++++++++++++
             Sell.QuantityInput = "1"
             Sell.BarCodeInput = ""
+            Sell.SearchInput = ""
             this.handleChangeOfFocus({Position: "BarCodeInput"})
             this.setState({"Products": Products, "CurrentSell": Sell, "ToPay": NewToPay})
 
@@ -237,6 +240,8 @@ export default class SalesPage extends React.Component {
             )
         })
 
+        const AddItemOrSeachIcon = (this.state.CurrentSell.SearchInput == "")? "arrow_forward": "search"
+
         return (
             <div className="card-panel blue-grey lighten-5 black-text">
                 
@@ -258,7 +263,7 @@ export default class SalesPage extends React.Component {
                                 </span>
                             </div>
 
-                            <div className="s4">
+                            <div className="col s4">
                                 <a className="waves-effect waves-light btn-large">Pagar</a>
                             </div>
                         </div>
@@ -267,18 +272,18 @@ export default class SalesPage extends React.Component {
                     <div className="hide-on-med-and-up">
                         <div className="row container">
                            <span
-                                className = "s5" 
+                                className = "col s5" 
                                 style={{fontWeight: 300, fontSize: '2rem'}}>
                                 Pagar: &nbsp;&nbsp;
                             </span>
                            <span
-                                className = "s7" 
+                                className = "col s7" 
                                 style={{fontWeight: 600, fontSize: '2rem'}}>
                                 ${this.state.ToPay.toFixed(2)}
                             </span>
                         </div>
                         <div className="row">
-                            <div className="s10 offset-s1">
+                            <div className="col s10 offset-s1">
                                 <a className="waves-effect waves-light btn-large">Pagar</a>
                             </div>
                         </div>
@@ -317,7 +322,7 @@ export default class SalesPage extends React.Component {
                                         Cantidad
                                     </span>
                                     &nbsp;
-                                    <span className="hide-on-med-and-down"  style={{fontSize: '0.8em'}}>
+                                    <span className="hide-on-small-only"  style={{fontSize: '0.8em'}}>
                                         o Precio
                                     </span>
                                 </label>
@@ -326,7 +331,7 @@ export default class SalesPage extends React.Component {
                             {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                             {/*+++++++++          BAR CODE INPUT        ++++++++++++*/}
                             {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                            <div className="input-field col s5">
+                            <div className="input-field col s4">
                                 <input 
                                     id        = "BarCodeInput" 
                                     type      = "text"
@@ -349,7 +354,7 @@ export default class SalesPage extends React.Component {
                             {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                             {/*+++++++++         SEARCH INPUT           ++++++++++++*/}
                             {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                            <div className="input-field col s5">
+                            <div className="input-field col s4">
                                 <input 
                                     id        = "SearchInput" 
                                     type      = "text"
@@ -368,6 +373,19 @@ export default class SalesPage extends React.Component {
                                 </label>
                             </div>
 
+                            {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                            {/*+++++++++         ADD BUTTON             ++++++++++++*/}
+                            {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                            <div className="col s1">
+                                <p className="">
+                                    <button 
+                                        onClick   = {() => this.handleAddCurrentProduct()}
+                                        className = "waves-effect btn-floating waves-light green btn-flat">
+                                        <i className="material-icons">{AddItemOrSeachIcon}</i>
+                                    </button>
+                                </p>
+                            </div>
+
                         </div>
 
                     </HotKeys>
@@ -375,22 +393,31 @@ export default class SalesPage extends React.Component {
                     {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                     {/*+++++++++          ERROR MODAL           ++++++++++++*/}
                     {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                    <div 
-                        id        = "ErrorModal"
-                        className = "modal modal-fixed-footer"
-                        style     = {{width: '45%', height: '20rem'}} >
-                        
-                        <div className="modal-content">
-                            <h4>Error</h4>
-                            {this.state.ErrorMessage}
-                        </div>
+                    <HotKeys 
+                        keyMap   = {{"CloseModal": 'enter'}}
+                        handlers = {{
+                            "CloseModal": (e) => {
+                                const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
+                                InstanceModal.close()
+                            }
+                        }}>
+                        <div 
+                            id        = "ErrorModal"
+                            className = "modal modal-fixed-footer"
+                            style     = {{width: '70%'}} >
+                            
+                            <div className="modal-content">
+                                <h4>Error</h4>
+                                {this.state.ErrorMessage}
+                            </div>
 
-                        <div className="modal-footer">
-                            <a className="btn-flat modal-close waves-effect waves-red red lighten-2">
-                                <span className="white-text">Salir</span>
-                            </a>
+                            <div className="modal-footer">
+                                <a className="btn-flat modal-close waves-effect waves-red red lighten-2">
+                                    <span className="white-text">Salir</span>
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    </HotKeys>
 
                 </div>
 
@@ -399,25 +426,31 @@ export default class SalesPage extends React.Component {
                 {/*=========          PRODUCTS TABLE        ============*/}
                 {/*=====================================================*/}
                 <div className="divider" />
-                <div className="row section">
-                    <table className="bordered highlight col s10 offset-s1 responsive-table">
-                        <thead>
-                            <tr>
-                                <th>Cantidad</th>
-                                <th>Producto</th>
-                                <th>Precio Unitario</th>
-                                <th>SubTotal</th>
-                                <th>Eliminar</th>
-                            </tr>
-                        </thead>
+                <div className="section">
+                    <div className="row">
+                        <table className="bordered highlight col s10 offset-s1 responsive-table">
+                            <thead>
+                                <tr>
+                                    <th>Cantidad</th>
+                                    <th>Producto</th>
+                                    <th>Precio Unitario</th>
+                                    <th>SubTotal</th>
+                                    <th>Eliminar</th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            {TableProductsItems}
-                        </tbody>
-                    </table>
+                            <tbody>
+                                {TableProductsItems}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </div>
         )
     }
 }
+
+
+
+

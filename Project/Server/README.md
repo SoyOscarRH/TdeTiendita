@@ -6,9 +6,8 @@ All the files to make the back end work
 ### Important Commands
 
 ```
-$FLASK_DEBUG=1 FLASK_APP=Application.py flask run
+FLASK_DEBUG=1 FLASK_APP=Application.py flask run --host=192.168.1.71
 ```
-
 
 ## MySQL
 
