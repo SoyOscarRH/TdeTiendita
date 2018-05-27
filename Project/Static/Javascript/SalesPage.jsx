@@ -5,6 +5,12 @@ import React from "react"
 import {HotKeys} from "react-hotkeys"
 import {SentData} from "./CoolFunctions.js"
 
+
+
+
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+// ||||||||||||           SALES PAGE       |||||||||||||||||||||||||||||
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 export default class SalesPage extends React.Component {
 
     // =========================================================
@@ -69,30 +75,35 @@ export default class SalesPage extends React.Component {
         this.setState({CurrentSell: NewCurrentSell, FocusGroup: NewFocusGroup})
     }
 
+
     handleChangeOfFocus (Parameters) {
-        const NewFocusGroup = Object.assign({}, this.state.FocusGroup)
-        let NewCurrentFocus = 0
+        this.setState((PrevState) => {
+            const NewFocusGroup = PrevState.FocusGroup
+            let NewCurrentFocus = 0
 
-        if (Parameters['Position'] != undefined) {
-            if (Parameters['Position'] == "QuantityInput") NewCurrentFocus = 0
-            if (Parameters['Position'] == "BarCodeInput")  NewCurrentFocus = 1
-            if (Parameters['Position'] == "SearchInput")   NewCurrentFocus = 2
-        }
-        else {
-            const Move = (Parameters['Direction'] === "right")? 1: -1
-            NewCurrentFocus = (NewFocusGroup.CurrentFocus + Move) % 3
-            if (NewCurrentFocus < 0) NewCurrentFocus += 3
-        }
+            if (Parameters['Position'] != undefined) {
+                if (Parameters['Position'] == "QuantityInput") NewCurrentFocus = 0
+                if (Parameters['Position'] == "BarCodeInput")  NewCurrentFocus = 1
+                if (Parameters['Position'] == "SearchInput")   NewCurrentFocus = 2
+            }
+            else {
+                const Move = (Parameters['Direction'] === "right")? 1: -1
+                NewCurrentFocus = (NewFocusGroup.CurrentFocus + Move) % 3
+                if (NewCurrentFocus < 0) NewCurrentFocus += 3
+            }
 
-        NewFocusGroup.CurrentFocus = NewCurrentFocus
-        this.setState({FocusGroup: NewFocusGroup})
+            document.getElementById(NewFocusGroup.FocusElements[NewCurrentFocus]).focus()
+            PrevState.FocusGroup.CurrentFocus = NewCurrentFocus
 
-        document.getElementById(NewFocusGroup.FocusElements[NewFocusGroup.CurrentFocus]).focus()
+            return {"FocusGroup": NewFocusGroup}
+        })
+
     }
 
     handleAddCurrentProduct () {
 
         const Sell = Object.assign({}, this.state.CurrentSell)
+        Sell.BarCodeInput = Sell.BarCodeInput.toLowerCase()
 
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // ++++++      CHECK IF IS QUANTITY OR PRICE     ++++++++++
@@ -102,15 +113,13 @@ export default class SalesPage extends React.Component {
             Sell.QuantityInput = Number(Sell.QuantityInput.slice(Sell.IsPrice? 1: 0))
 
             if (Number.isNaN(Sell.QuantityInput) || Sell.QuantityInput <= 0) {
-                let Message = (
+                this.setState({ErrorMessage: (
                     <div>
                         <h5> Error con el Precio ó Cantidad</h5>
                         <br />
                             Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
                     </div>
-                )
-
-                this.setState({ErrorMessage: Message})
+                )})
 
                 const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
 
@@ -168,9 +177,6 @@ export default class SalesPage extends React.Component {
             // ++++++++++++++++++++++++++++++++++++++++++++
             // ++    WE HAVE THE PRODUCT IN THE LIST?    ++
             // ++++++++++++++++++++++++++++++++++++++++++++
-
-            const NewToPay = this.state.ToPay + (Results['UnitPrice'] * NewQuantity)
-
             const ExistAlready = Products.some(
                 (Product) => {
                     if (Product['Code'] === Results['BarCode']) {
@@ -200,7 +206,7 @@ export default class SalesPage extends React.Component {
             Sell.BarCodeInput = ""
             Sell.SearchInput = ""
             this.handleChangeOfFocus({Position: "BarCodeInput"})
-            this.setState({"Products": Products, "CurrentSell": Sell, "ToPay": NewToPay})
+            this.setState({"Products": Products, "CurrentSell": Sell})
 
         })
         .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
@@ -212,36 +218,6 @@ export default class SalesPage extends React.Component {
     // =========================================================
     render () {
 
-        const TableProductsItems = this.state.Products.map( (Product) => {
-
-            let VisualQuantity = Number(Product.Quantity)
-            if (!Number.isInteger(VisualQuantity)) VisualQuantity = VisualQuantity.toFixed(3)
-
-            const DeleteItem = (Product) => {
-                const NewProducts = this.state.Products.filter(Item => Item.Code !== Product.Code)
-                const NewToPay = this.state.ToPay - (Product.UnitPrice * Product.Quantity)
-                this.setState({"Products": NewProducts, "ToPay": NewToPay})
-            }
-
-            return (
-                <tr key={Product.Code}>
-                    <td>  {VisualQuantity}                                      </td>
-                    <td>  {Product.Name}                                        </td>
-                    <td>$ {Product.UnitPrice.toFixed(2)}                        </td>
-                    <td>$ {(Product.UnitPrice * Product.Quantity).toFixed(2)}   </td>
-                    <td>
-                        <a 
-                            onClick   = {() => DeleteItem(Product)}
-                            className = "waves-effect waves-light btn-flat red lighten-1">
-                            <i className="white-text material-icons">close</i>
-                        </a>
-                    </td>
-                </tr>
-            )
-        })
-
-        const AddItemOrSeachIcon = (this.state.CurrentSell.SearchInput == "")? "arrow_forward": "search"
-
         return (
             <div className="card-panel blue-grey lighten-5 black-text">
                 
@@ -250,56 +226,15 @@ export default class SalesPage extends React.Component {
                 {/*==============     HEADER TO PAY ====================*/}
                 {/*=====================================================*/}
                 <div className="section grey-text text-darken-3">
-
-                    <div className="hide-on-small-only">
-                        <div className="row">
-                            <div className="input-field col s7 offset-s1 center-align valign-wrapper">
-                                <span 
-                                    style={{fontWeight: 300, fontSize: '2rem'}}>
-                                    Por Pagar: &nbsp;&nbsp;
-                                </span>
-                                <span style={{fontWeight: 600, fontSize: '2rem'}}>
-                                    ${this.state.ToPay.toFixed(2)}
-                                </span>
-                            </div>
-
-                            <div className="col s4">
-                                <a className="waves-effect waves-light btn-large">Pagar</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="hide-on-med-and-up">
-                        <div className="row container">
-                           <span
-                                className = "col s5" 
-                                style={{fontWeight: 300, fontSize: '2rem'}}>
-                                Pagar: &nbsp;&nbsp;
-                            </span>
-                           <span
-                                className = "col s7" 
-                                style={{fontWeight: 600, fontSize: '2rem'}}>
-                                ${this.state.ToPay.toFixed(2)}
-                            </span>
-                        </div>
-                        <div className="row">
-                            <div className="col s10 offset-s1">
-                                <a className="waves-effect waves-light btn-large">Pagar</a>
-                            </div>
-                        </div>
-                    </div>
-
+                    <SectionToPay Products={this.state.Products} />
                 </div>
+                
 
                 {/*=====================================================*/}
                 {/*=========    SELECTOR FOR NEW PRODUCT    ============*/}
                 {/*=====================================================*/}
                 <div className="divider" />
                 <div className="section">
-
-                    {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                    {/*+++++++++            MODALS              ++++++++++++*/}
-                    {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                     <HotKeys 
                         keyMap   = {this.state.HotKeysMapping.keyMap} 
                         handlers = {this.state.HotKeysMapping.handlers}>
@@ -315,7 +250,7 @@ export default class SalesPage extends React.Component {
                                     type         = "text"
                                     value        = {this.state.CurrentSell.QuantityInput}
                                     onFocus      = {() => this.handleChangeOfFocus({Position: "QuantityInput"})}
-                                    onChange     = {(e) => this.handleChangeSaleData(e, "QuantityInput")}
+                                    onChange     = {(e) => this.handleChangeSaleData(e.target.value, "QuantityInput")}
                                 />
                                 <label htmlFor="QuantityInput">
                                     <span style={{fontSize: '0.8em'}}>
@@ -338,7 +273,7 @@ export default class SalesPage extends React.Component {
                                     autoFocus = {true}
                                     value     = {this.state.CurrentSell.BarCodeInput}
                                     onFocus   = {() => this.handleChangeOfFocus({Position: "BarCodeInput"})}
-                                    onChange  = {(e) => this.handleChangeSaleData(e, "BarCodeInput")}
+                                    onChange  = {(e) => this.handleChangeSaleData(e.target.value, "BarCodeInput")}
                                 />
                                 <label htmlFor="BarCodeInput">
                                     <span>
@@ -360,7 +295,7 @@ export default class SalesPage extends React.Component {
                                     type      = "text"
                                     value     = {this.state.CurrentSell.SearchInput}
                                     onFocus   = {() => this.handleChangeOfFocus({Position: "SearchInput"})}
-                                    onChange  = {(e) => this.handleChangeSaleData(e, "SearchInput")}
+                                    onChange  = {(e) => this.handleChangeSaleData(e.target.value, "SearchInput")}
                                 />
                                 <label htmlFor="SearchInput">
                                     <span>
@@ -381,7 +316,9 @@ export default class SalesPage extends React.Component {
                                     <button 
                                         onClick   = {() => this.handleAddCurrentProduct()}
                                         className = "waves-effect btn-floating waves-light green btn-flat">
-                                        <i className="material-icons">{AddItemOrSeachIcon}</i>
+                                        <i className="material-icons">
+                                            {(this.state.CurrentSell.SearchInput == "")? "arrow_forward": "search"}
+                                        </i>
                                     </button>
                                 </p>
                             </div>
@@ -389,37 +326,8 @@ export default class SalesPage extends React.Component {
                         </div>
 
                     </HotKeys>
-
-                    {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                    {/*+++++++++          ERROR MODAL           ++++++++++++*/}
-                    {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                    <HotKeys 
-                        keyMap   = {{"CloseModal": 'enter'}}
-                        handlers = {{
-                            "CloseModal": (e) => {
-                                const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
-                                InstanceModal.close()
-                            }
-                        }}>
-                        <div 
-                            id        = "ErrorModal"
-                            className = "modal modal-fixed-footer"
-                            style     = {{width: '70%'}} >
-                            
-                            <div className="modal-content">
-                                <h4>Error</h4>
-                                {this.state.ErrorMessage}
-                            </div>
-
-                            <div className="modal-footer">
-                                <a className="btn-flat modal-close waves-effect waves-red red lighten-2">
-                                    <span className="white-text">Salir</span>
-                                </a>
-                            </div>
-                        </div>
-                    </HotKeys>
-
                 </div>
+
 
 
                 {/*=====================================================*/}
@@ -427,28 +335,163 @@ export default class SalesPage extends React.Component {
                 {/*=====================================================*/}
                 <div className="divider" />
                 <div className="section">
-                    <div className="row">
-                        <table className="bordered highlight col s10 offset-s1 responsive-table">
-                            <thead>
-                                <tr>
-                                    <th>Cantidad</th>
-                                    <th>Producto</th>
-                                    <th>Precio Unitario</th>
-                                    <th>SubTotal</th>
-                                    <th>Eliminar</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {TableProductsItems}
-                            </tbody>
-                        </table>
-                    </div>
+                    <ProductsTable 
+                        Products       = {this.state.Products} 
+                        handleSetState = {(NewFunction) => this.setState(NewFunction)}
+                    />
                 </div>
 
+
+
+                {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                {/*+++++++++          ERROR MODAL           ++++++++++++*/}
+                {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
+                <HotKeys 
+                    keyMap   = {{"CloseModal": 'enter'}}
+                    handlers = {{
+                        "CloseModal": (e) => {
+                            const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
+                            InstanceModal.close()
+                        }
+                    }}>
+                    <div 
+                        id        = "ErrorModal"
+                        className = "modal modal-fixed-footer"
+                        style     = {{width: '70%'}} >
+                        
+                        <div className="modal-content">
+                            <h4>Error</h4>
+                            {this.state.ErrorMessage}
+                        </div>
+
+                        <div className="modal-footer">
+                            <a className="btn-flat modal-close waves-effect waves-red red lighten-2">
+                                <span className="white-text">Salir</span>
+                            </a>
+                        </div>
+                    </div>
+                </HotKeys>
             </div>
         )
     }
+}
+
+
+
+
+
+
+
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+// ||||||||||||          SHOW TO PAY              ||||||||||||||||||||||
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+function SectionToPay(props) {
+
+    let InitialValue = 0
+    const ToPay = props.Products.reduce((accumulator, Product) => {
+        let NewValue = Product.Quantity * Product.UnitPrice
+        return accumulator + NewValue
+    }, InitialValue)
+
+    return (
+
+        <div>
+            <div className="hide-on-small-only">
+                <div className="row">
+                    <div className="input-field col s7 offset-s1 center-align valign-wrapper">
+                        <span 
+                            style={{fontWeight: 300, fontSize: '2rem'}}>
+                            Por Pagar: &nbsp;&nbsp;
+                        </span>
+                        <span style={{fontWeight: 600, fontSize: '2rem'}}>
+                            ${ToPay.toFixed(2)}
+                        </span>
+                    </div>
+
+                    <div className="col s4">
+                        <a className="waves-effect waves-light btn-large">Pagar</a>
+                    </div>
+                </div>
+            </div>
+            <div className="hide-on-med-and-up">
+                <div className="row container">
+                   <span
+                        className = "col s5" 
+                        style={{fontWeight: 300, fontSize: '2rem'}}>
+                        Pagar: &nbsp;&nbsp;
+                    </span>
+                   <span
+                        className = "col s7" 
+                        style={{fontWeight: 600, fontSize: '2rem'}}>
+                        ${ToPay.toFixed(2)}
+                    </span>
+                </div>
+                <div className="row">
+                    <div className="col s10 offset-s1">
+                        <a className="waves-effect waves-light btn-large">Pagar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
+
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+// ||||||||||||           SHOW PRODUCT TABLE      ||||||||||||||||||||||
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+function ProductsTable(props) {
+
+    const TableProductsItems = props.Products.map( (Product) => {
+
+        let VisualQuantity = Number(Product.Quantity)
+        if (!Number.isInteger(VisualQuantity)) VisualQuantity = VisualQuantity.toFixed(3)
+
+        const DeleteItem = (Product) => {
+            props.handleSetState((PrevState) => {
+                const NewProducts = PrevState.Products.filter(Item => Item.Code !== Product.Code)
+                return {"Products": NewProducts}
+            })
+        }
+
+        return (
+            <tr key={Product.Code}>
+                <td>  {VisualQuantity}                                      </td>
+                <td>  {Product.Name}                                        </td>
+                <td>$ {Product.UnitPrice.toFixed(2)}                        </td>
+                <td>$ {(Product.UnitPrice * Product.Quantity).toFixed(2)}   </td>
+                <td>
+                    <a 
+                        onClick      = {() => DeleteItem(Product)}
+                        className    = "waves-effect waves-light btn-flat red lighten-1">
+                        <i className = "white-text material-icons">close</i>
+                    </a>
+                </td>
+            </tr>
+        )
+    })
+
+
+    return (
+        <div className="row">
+            <table className="bordered highlight col s10 offset-s1 responsive-table">
+                <thead>
+                    <tr>
+                        <th>Cantidad</th>
+                        <th>Producto</th>
+                        <th>Precio Unitario</th>
+                        <th>SubTotal</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {TableProductsItems}
+                </tbody>
+            </table>
+        </div>
+    )
 }
 
 
