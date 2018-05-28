@@ -53,7 +53,7 @@ def DataFromBarCode():
     BarCode = request.json['BarCodeInput'].strip()
 
     with Connection.cursor() as Cursor:
-        SQLQuery = "SELECT Price, Name from Product WHERE CodeBar = %s"
+        SQLQuery = "SELECT PriceOfSale, Name from Product WHERE CodeBar = %s"
         Cursor.execute(SQLQuery, BarCode)
         Results = Cursor.fetchone()
 
@@ -64,6 +64,17 @@ def DataFromBarCode():
         else:
             return json.dumps({"UnitPrice": Results[0], "BarCode": BarCode, "Name": Results[1]})
 
+
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++    DATA FROM BAR CODE       ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
+@WebApp.route("/SaleProducts", methods=['POST'])
+def SaleProducts():
+    
+    Data = request.json
+    print(Data)
+
+    return json.dumps({"Result": "Happy"}) 
 
 
 

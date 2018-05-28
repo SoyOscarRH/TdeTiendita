@@ -22,7 +22,7 @@ export default class SalesPage extends React.Component {
         this.state = {
             ToPay: 0.0,
             ErrorMessage: "",
-            CurrentSell: {
+            CurrentSale: {
                 QuantityInput: "1",
                 BarCodeInput: "",
                 SearchInput: "",
@@ -68,13 +68,13 @@ export default class SalesPage extends React.Component {
     // =========================================================
     handleChangeSaleData (NewValue, Item) {
         this.setState((PrevState) => {
-            const NewCurrentSell = PrevState.CurrentSell
+            const NewCurrentSale = PrevState.CurrentSale
             const NewFocusGroup = PrevState.FocusGroup
             
-            NewCurrentSell[Item] = NewValue
+            NewCurrentSale[Item] = NewValue
             NewFocusGroup.CurrentFocus = NewFocusGroup.FocusElements.findIndex(name => name === Item)
             
-            return {CurrentSell: NewCurrentSell, FocusGroup: NewFocusGroup}
+            return {CurrentSale: NewCurrentSale, FocusGroup: NewFocusGroup}
         })
     }
 
@@ -101,17 +101,17 @@ export default class SalesPage extends React.Component {
 
     handleAddCurrentProduct () {
 
-        const Sell = Object.assign({}, this.state.CurrentSell)
-        Sell.BarCodeInput = Sell.BarCodeInput.toLowerCase()
+        const Sale = Object.assign({}, this.state.CurrentSale)
+        Sale.BarCodeInput = Sale.BarCodeInput.toLowerCase()
 
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // ++++++      CHECK IF IS QUANTITY OR PRICE     ++++++++++
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-            Sell.IsPrice = Sell.QuantityInput[0] === '$'
-            Sell.QuantityInput = Number(Sell.QuantityInput.slice(Sell.IsPrice? 1: 0))
+            Sale.IsPrice = Sale.QuantityInput[0] === '$'
+            Sale.QuantityInput = Number(Sale.QuantityInput.slice(Sale.IsPrice? 1: 0))
 
-            if (Number.isNaN(Sell.QuantityInput) || Sell.QuantityInput <= 0) {
+            if (Number.isNaN(Sale.QuantityInput) || Sale.QuantityInput <= 0) {
                 this.setState({ErrorMessage: (
                     <div>
                         <h5> Error con el Precio ó Cantidad</h5>
@@ -131,7 +131,7 @@ export default class SalesPage extends React.Component {
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // ++++++     SEND TO FIND THE PRICE AND NAME     +++++++++
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        SentData('/DataFromBarCode', Sell)
+        SentData('/DataFromBarCode', Sale)
         .then(Results => {
 
             // ++++++++++++++++++++++++++++++++++++++++++++
@@ -159,19 +159,20 @@ export default class SalesPage extends React.Component {
                     // ++++++++++++++++++++++++++++++++++++++++++++
                     // ++++   SET THE STATE AS IT SHOULD   ++++++++
                     // ++++++++++++++++++++++++++++++++++++++++++++
-                    Sell.BarCodeInput = ""
-                    Sell.SearchInput = ""
-                    Sell.QuantityInput = Sell.IsPrice? "$" + String(Sell.QuantityInput): String(Sell.QuantityInput)
-                    this.setState({"CurrentSell": Sell})
+                    Sale.BarCodeInput = ""
+                    Sale.SearchInput = ""
+                    Sale.QuantityInput = Sale.IsPrice? "$" + String(Sale.QuantityInput): String(Sale.QuantityInput)
+                    this.setState({"CurrentSale": Sale})
 
                     return
                 }
 
             
             const Products = [...this.state.Products]
-            const NewQuantity = (Sell.IsPrice)? 
-                Sell.QuantityInput / Results['UnitPrice']:
-                Sell.QuantityInput
+            Sale.QuantityInput = Number(Sale.QuantityInput)
+            const NewQuantity = (Sale.IsPrice)? 
+                Sale.QuantityInput / Number(Results['UnitPrice']):
+                Sale.QuantityInput
 
             // ++++++++++++++++++++++++++++++++++++++++++++
             // ++    WE HAVE THE PRODUCT IN THE LIST?    ++
@@ -179,7 +180,7 @@ export default class SalesPage extends React.Component {
             const ExistAlready = Products.some(
                 (Product) => {
                     if (Product['Code'] === Results['BarCode']) {
-                        Product['Quantity'] = String(Number(NewQuantity) + Number(Product['Quantity']))
+                        Product['Quantity'] += NewQuantity
                         return true
                     }
                     return false
@@ -191,7 +192,7 @@ export default class SalesPage extends React.Component {
             // ++++++++++++++++++++++++++++++++++++++++++++
             if (!ExistAlready) {
                 Products.unshift({
-                    "Quantity":  String(NewQuantity),
+                    "Quantity":  NewQuantity,
                     "Name":      Results['Name'],
                     "Code":      Results['BarCode'],
                     "UnitPrice": Results['UnitPrice']
@@ -201,11 +202,54 @@ export default class SalesPage extends React.Component {
             // ++++++++++++++++++++++++++++++++++++++++++++
             // ++++   SET THE STATE AS IT SHOULD   ++++++++
             // ++++++++++++++++++++++++++++++++++++++++++++
-            Sell.QuantityInput = "1"
-            Sell.BarCodeInput = ""
-            Sell.SearchInput = ""
+            Sale.QuantityInput = "1"
+            Sale.BarCodeInput = ""
+            Sale.SearchInput = ""
             this.handleChangeOfFocus({Position: "BarCodeInput"})
-            this.setState({"Products": Products, "CurrentSell": Sell})
+            this.setState({"Products": Products, "CurrentSale": Sale})
+
+        })
+        .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
+    }
+
+
+    handleSendSale() {
+
+        SentData('/SaleProducts', this.state.Products)
+        .then(Results => {
+
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            // ++++++          IF NOT FIND        +++++++++
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            if (Results['Error'] != undefined) {
+
+                this.setState({ErrorMessage:  (
+                        <div>
+                            <h5> Error con la Venta de Productos </h5>
+                            <br />
+                            {Results['Error']}
+                            <br />
+                            <br />
+                            <div>
+                                Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
+                            </div>
+                        </div>
+                    )
+                })
+
+                const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
+                InstanceModal.options.onCloseEnd = () => this.handleChangeOfFocus({Position: "BarCodeInput"}) 
+                InstanceModal.open()
+
+                return
+            }
+
+            
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            // ++++   SET THE STATE AS IT SHOULD   ++++++++
+            // ++++++++++++++++++++++++++++++++++++++++++++
+            this.handleChangeOfFocus({Position: "BarCodeInput"})
+            this.setState({"Products": []})
 
         })
         .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
@@ -225,7 +269,7 @@ export default class SalesPage extends React.Component {
                 {/*==============     HEADER TO PAY ====================*/}
                 {/*=====================================================*/}
                 <div className="section grey-text text-darken-3">
-                    <SectionToPay Products={this.state.Products} />
+                    <SectionToPay Products={this.state.Products} handleSendSale={() => this.handleSendSale()} />
                 </div>
                 
 
@@ -247,7 +291,7 @@ export default class SalesPage extends React.Component {
                                 <input 
                                     id           = "QuantityInput" 
                                     type         = "text"
-                                    value        = {this.state.CurrentSell.QuantityInput}
+                                    value        = {this.state.CurrentSale.QuantityInput}
                                     onFocus      = {() => this.handleChangeOfFocus({Position: "QuantityInput"})}
                                     onChange     = {(e) => this.handleChangeSaleData(e.target.value, "QuantityInput")}
                                 />
@@ -270,7 +314,7 @@ export default class SalesPage extends React.Component {
                                     id        = "BarCodeInput" 
                                     type      = "text"
                                     autoFocus = {true}
-                                    value     = {this.state.CurrentSell.BarCodeInput}
+                                    value     = {this.state.CurrentSale.BarCodeInput}
                                     onFocus   = {() => this.handleChangeOfFocus({Position: "BarCodeInput"})}
                                     onChange  = {(e) => this.handleChangeSaleData(e.target.value, "BarCodeInput")}
                                 />
@@ -292,7 +336,7 @@ export default class SalesPage extends React.Component {
                                 <input 
                                     id        = "SearchInput" 
                                     type      = "text"
-                                    value     = {this.state.CurrentSell.SearchInput}
+                                    value     = {this.state.CurrentSale.SearchInput}
                                     onFocus   = {() => this.handleChangeOfFocus({Position: "SearchInput"})}
                                     onChange  = {(e) => this.handleChangeSaleData(e.target.value, "SearchInput")}
                                 />
@@ -316,7 +360,7 @@ export default class SalesPage extends React.Component {
                                         onClick   = {() => this.handleAddCurrentProduct()}
                                         className = "waves-effect btn-floating waves-light green btn-flat">
                                         <i className="material-icons">
-                                            {(this.state.CurrentSell.SearchInput == "")? "arrow_forward": "search"}
+                                            {(this.state.CurrentSale.SearchInput == "")? "arrow_forward": "search"}
                                         </i>
                                     </button>
                                 </p>
@@ -408,7 +452,9 @@ function SectionToPay(props) {
                     </div>
 
                     <div className="col s4">
-                        <a className="waves-effect waves-light btn-large">Pagar</a>
+                        <a onClick={props.handleSendSale} className="waves-effect waves-light btn-large">
+                            Pagar
+                        </a>
                     </div>
                 </div>
             </div>
@@ -427,7 +473,9 @@ function SectionToPay(props) {
                 </div>
                 <div className="row">
                     <div className="col s10 offset-s1">
-                        <a className="waves-effect waves-light btn-large">Pagar</a>
+                        <a onClick={props.handleSendSale} className="waves-effect waves-light btn-large">
+                            Pagar
+                        </a>
                     </div>
                 </div>
             </div>
@@ -444,8 +492,9 @@ function ProductsTable(props) {
 
     const TableProductsItems = props.Products.map( (Product) => {
 
-        let VisualQuantity = Number(Product.Quantity)
-        if (!Number.isInteger(VisualQuantity)) VisualQuantity = VisualQuantity.toFixed(3)
+        let VisualQuantity = (Number.isInteger(Product.Quantity))? 
+            Product.Quantity: 
+            Product.Quantity.toFixed(3)
 
         const DeleteItem = (Product) => {
             props.handleSetState((PrevState) => {

@@ -44,8 +44,8 @@
 	 * ======================================================
 	 */
   	INSERT INTO Product VALUES 
-	    ('TOR', 'Tortillas', 9.0, 10.0, 50, 'Maizote'),
-	    ('TOT', 'Totopos', 15.0, 20.0, 50, 'Maizote');
+	    ('TOR', 'Tortillas', 9.0, 10.0, 50.0, 'Maizote'),
+	    ('TOT', 'Totopos', 15.0, 20.0, 50.0, 'Maizote');
 
 
 

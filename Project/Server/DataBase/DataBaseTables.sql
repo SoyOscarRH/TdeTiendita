@@ -2,7 +2,6 @@
  * =================       TABLES          =======================
  * ===============================================================
  */
-
 DROP DATABASE IF EXISTS TdeTiendita;
 CREATE DATABASE TdeTiendita;
 USE TdeTiendita;
@@ -121,6 +120,7 @@ CREATE TABLE Schedule (
                             '21:00', '21:30', '22:00', '22:30', '23:00', '23:30',
                             'undefined'
                         ),
+
     FridayEnd           ENUM(
                             '00:00', '00:30', '01:00', '01:30', '02:00', '02:30',
                             '03:00', '03:30', '04:00', '04:30', '05:00', '05:30',
@@ -185,7 +185,6 @@ CREATE TABLE Schedule (
 );
 
 
-
 /* ======================================================
  * =================  EMPLOYEES   =======================
  * ======================================================
@@ -240,7 +239,6 @@ CREATE TABLE Brand (
         REFERENCES Provider(Name)
         ON DELETE CASCADE
         ON UPDATE CASCADE
-
 );
 
 /* ======================================================
@@ -250,9 +248,9 @@ CREATE TABLE Brand (
 CREATE TABLE Product (
     CodeBar             VARCHAR(15),
     Name                VARCHAR(100),
-    Price               REAL,
+    PriceOfSale         REAL,
     PriceAcquisition    REAL,
-    CurrentQuantity     INT,
+    CurrentQuantity     REAL,
     Brand               VARCHAR(15),
 
     PRIMARY KEY(CodeBar),
@@ -263,6 +261,46 @@ CREATE TABLE Product (
         ON UPDATE CASCADE
 );
 
+
+/* ======================================================
+ * =================     SALE     =======================
+ * ======================================================
+ */
+CREATE TABLE Sale (
+    ID                  INT NOT NULL AUTO_INCREMENT,
+    EmployeeID          INT,
+    DateOfSale          DATETIME,
+
+    PRIMARY KEY(ID),
+
+    FOREIGN KEY (EmployeeID)
+        REFERENCES Employee(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+
+/* ======================================================
+ * =============     UNITSALE     =======================
+ * ======================================================
+ */
+CREATE TABLE UnitSale (
+    SaleID              INT,
+    ProductCodeBar      VARCHAR(15),
+    QuantitySell        REAL,
+
+    PRIMARY KEY(SaleID, ProductCodeBar),
+
+    FOREIGN KEY (SaleID)
+        REFERENCES Sale(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    FOREIGN KEY (ProductCodeBar)
+        REFERENCES Product(CodeBar)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
 
 
 
