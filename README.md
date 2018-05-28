@@ -31,6 +31,9 @@
 - Autofocus in codebar
 - If you put `$` then it will be render as a price or for example or 
 `$10` means $10 of an item or like $10 of eggs and `10` is 10 items
+- You can navigate through a sale with buttons or hot keys
+- Is responsive, even on Mobile
+- You can delete an item
 - You have a ton of Hot Keys:
 	- MoveFocusToRight: with `shift+right` or `alt+right` or `ctrl+right`
 	- MoveFocusToLeft: with `shift+left` or `alt+left` or `ctrl+left`
@@ -44,3 +47,5 @@
 
 
 <img src="Graphics/SalesPage2.png" width="85%">
+<img src="Graphics/SalesPage3.png" width="85%">
+<img src="Graphics/SalesPage4.png" width="85%">
