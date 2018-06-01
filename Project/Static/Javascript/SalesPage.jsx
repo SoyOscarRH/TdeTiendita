@@ -393,8 +393,7 @@ export default class SalesPage extends React.Component {
                     keyMap   = {{"CloseModal": 'enter'}}
                     handlers = {{
                         "CloseModal": (e) => {
-                            const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
-                            InstanceModal.close()
+                            InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal')).close()
                         }
                     }}>
                     <div 
