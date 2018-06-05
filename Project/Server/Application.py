@@ -50,7 +50,8 @@ def index():
 @WebApp.route("/DataFromBarCode", methods=['POST'])
 def DataFromBarCode():
     
-    BarCode = request.json['BarCodeInput'].strip()
+    BarCode = request.json.get('BarCodeInput')
+    if BarCode == None: return json.dumps({"Error": f"Error con el código de barras"})
 
     with Connection.cursor() as Cursor:
         SQLQuery = "SELECT PriceOfSale, Name from Product WHERE CodeBar = %s"
@@ -58,9 +59,7 @@ def DataFromBarCode():
         Results = Cursor.fetchone()
 
         if Results == None: 
-            return json.dumps({
-                "Error": f"No hay producto con código de barras {BarCode}"
-            })
+            return json.dumps({"Error": f"No hay producto con código de barras {BarCode}"})
         else:
             return json.dumps({"UnitPrice": Results[0], "BarCode": BarCode, "Name": Results[1]})
 
