@@ -25,11 +25,12 @@ export default class SalesPage extends React.Component {
             Products:     [],
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            M.Modal.init(document.getElementById('ErrorModal'), {dismissible: true, inDuration: 80, outDuration: 80})
-        })
+        this.SectionToAddNewProduct = React.createRef()
     }
 
+    componentDidMount() {
+        M.Modal.init(document.getElementById('ErrorModal'), {dismissible: true, inDuration: 80, outDuration: 80})
+    }
 
     // =========================================================
     // ===========              HANDLES            =============
@@ -64,6 +65,7 @@ export default class SalesPage extends React.Component {
             }
 
             this.setState({"Products": []})
+            this.SectionToAddNewProduct.current.handleChangeOfFocus({Position: 'BarCodeInput'})
         })
         .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
     }
@@ -72,7 +74,7 @@ export default class SalesPage extends React.Component {
      * Show a Modal and call CallbackOnClose when close 
      */
     ShowErrorMessage(Message, CallbackOnClose) {
-        this.setState(ErrorMessage: Message)
+        this.setState({ErrorMessage: Message})
         const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
         InstanceModal.options.onCloseEnd = CallbackOnClose
         InstanceModal.open()
@@ -136,8 +138,10 @@ export default class SalesPage extends React.Component {
                 <div className="divider" />
                 <div className="section">
                     <SectionToAddNewProduct 
-                        ShowErrorMessage={(Message, CallbackOnClose) => this.ShowErrorMessage(Message, CallbackOnClose)}
-                        AddProduct={(Product) => this.AddProduct(Product)}
+                        ref              = {this.SectionToAddNewProduct}
+                        ShowErrorMessage = {(Message, CallbackOnClose) => this.ShowErrorMessage(Message, CallbackOnClose)}
+                        AddProduct       = {(Product) => this.AddProduct(Product)}
+                        AutoFocus        = {true}
                     />
                 </div>
 
@@ -195,7 +199,7 @@ function SectionToPay(props) {
         <div>
             <div className="hide-on-small-only">
                 <div className="row">
-                    <div className="input-field col s7 offset-s1 center-align valign-wrapper">
+                    <div className="col s7 offset-s1 center-align valign-wrapper">
                         <span 
                             style={{fontWeight: 300, fontSize: '2rem'}}>
                             Por Pagar: &nbsp;&nbsp;
@@ -217,7 +221,7 @@ function SectionToPay(props) {
                    <span
                         className = "col s5" 
                         style={{fontWeight: 300, fontSize: '2rem'}}>
-                        Pagar: &nbsp;&nbsp;
+                        Pagar: &nbsp;
                     </span>
                    <span
                         className = "col s7" 
@@ -226,7 +230,7 @@ function SectionToPay(props) {
                     </span>
                 </div>
                 <div className="row">
-                    <div className="col s10 offset-s1">
+                    <div className="col s6 offset-s3">
                         <a onClick={props.handleSendSale} className="waves-effect waves-light btn-large">
                             Pagar
                         </a>
@@ -365,7 +369,7 @@ class SectionToAddNewProduct extends React.Component {
                     </div>
                 )
 
-                this.props.ShowErrorMessage(ErrorMessage, () => this.handleChangeOfFocus({Position: "QuantityInput"}))
+                this.props.ShowErrorMessage(ErrorMessage, () => this.handleChangeOfFocus({Position: "BarCodeInput"}))
 
                 Sale.BarCodeInput = ""
                 Sale.SearchInput = ""
@@ -439,7 +443,7 @@ class SectionToAddNewProduct extends React.Component {
                             onFocus      = {() => this.handleChangeOfFocus({Position: "QuantityInput"})}
                             onChange     = {(e) => this.handleCurrentSaleData(e.target.value, "QuantityInput")}
                         />
-                        <label htmlFor="QuantityInput">
+                        <label htmlFor="QuantityInput" className="active">
                             <span style={{fontSize: '0.8em'}}>
                                 Cantidad
                             </span>

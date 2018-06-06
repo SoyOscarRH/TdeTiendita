@@ -1,8 +1,5 @@
-import React from "react";
-
-
-
-
+import React from "react"
+import {Link} from "react-router-dom"
 
 // =====================================================================
 // ============     HEADER COMPONENT       =============================
@@ -10,23 +7,17 @@ import React from "react";
 export default class AppHeader extends React.Component {
 
     constructor(props) {
-        super(props);
-        this.state = {
-            value: null,
-        };
+        super(props)
 
         document.addEventListener('DOMContentLoaded', function() {
-            const Elements = document.querySelectorAll('.sidenav');
-            const Sidenavs = M.Sidenav.init(Elements, {draggable: true, edge: "left"});
-        });
-
+            const Elements = document.querySelectorAll('.sidenav')
+            const Sidenavs = M.Sidenav.init(Elements, {draggable: true, edge: "left"})
+        })
     }
 
     render () {
         return (
-            
             <div>
-
                 {/*=========================================================*/}
                 {/*================       NAV BAR        ===================*/}
                 {/*=========================================================*/}
@@ -40,12 +31,13 @@ export default class AppHeader extends React.Component {
                             </div>
 
                             {/*+++++++++++   LINK TO HOME   ++++++++++++*/}
-                            <a href="/index.html" className="brand-logo right">
+                            <Link to='/' className="brand-logo right">
                                 <i className="material-icons white-text">home</i>
-                            </a>
+                            </Link>
+                            
 
                             {/*+++++++++++      MENU       ++++++++++++++*/}
-                            <a href="#" data-target="SideMenu" className="sidenav-trigger show-on-large">
+                            <a id="ToogleSideBar" data-target="SideMenu" className="sidenav-trigger show-on-large">
                                 <i className="material-icons white-text">menu</i>
                             </a>
 
@@ -94,6 +86,12 @@ export default class AppHeader extends React.Component {
                     <li><div className="divider" /></li>
 
                     <li><a className="subheader">Productos</a></li>
+                    <li>
+                        <Link className="waves-effect" to='/SalesPage'>
+                            <i className="material-icons">attach_money</i>
+                            Página de Ventas
+                        </Link>
+                    </li>
                     <li>
                         <a className="waves-effect" href="#!">
                             <i className="material-icons">add_circle</i>
