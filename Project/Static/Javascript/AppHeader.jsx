@@ -63,7 +63,7 @@ export default class AppHeader extends React.Component {
                                 </div>
                                 
                                 <a href="#user"><img className="circle" src="/Distribution/Graphics/BackgroundBlue.jpg" /></a>
-                                <a href="#name"><span className="white-text name">Pepito Perez</span></a>
+                                <a href="#name"><span className="white-text name">{UserName}</span></a>
                                 <a href="#email"><span className="white-text email">Pepito@perez.com</span></a>
                             </div>
                         </div>

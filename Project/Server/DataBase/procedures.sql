@@ -1,5 +1,29 @@
 USE TdeTiendita;
 
+/* ======================================================
+ * =================  EMPLOYEES   =======================
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS GetProductDataFromBarCode;
+DELIMITER //
+CREATE PROCEDURE GetProductDataFromBarCode
+    (IN Barcode VARCHAR(15), 
+    OUT PriceOfSale DOUBLE, OUT Name VARCHAR(100))
+BEGIN
+    DECLARE EXIT HANDLER FOR 1062
+    BEGIN
+        SET salida = 0;
+        ROLLBACK;
+    END;
+    START TRANSACTION;
+        SELECT PriceOfSale, Name from Product WHERE CodeBar = (Barcode);
+    COMMIT;
+    SET salida = 1;
+END //
+DELIMITER ;
+
+
+/*
 DROP PROCEDURE IF EXISTS addEmployee;
 DELIMITER //
 CREATE PROCEDURE addEmployee(IN Name VARCHAR(30), IN Surnames VARCHAR(30), IN Password VARCHAR(30), IN Salary DOUBLE, IN Email VARCHAR(30), IN isAdmin BOOLEAN, OUT salida BOOLEAN)
@@ -140,3 +164,6 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS addUnitSale;
 DELIMITER //
 CREATE PROCEDURE addUnitSale(IN SaleID)
+
+
+*/

@@ -103,7 +103,7 @@ CREATE TABLE Brand (
  * ======================================================
  */
 CREATE TABLE Product (
-	CodeBar             VARCHAR(15) NOT NULL,
+	ID                  INT NOT NULL AUTO_INCREMENT,
 	Name                VARCHAR(100) NOT NULL,
 	Description			VARCHAR(300),
 	PriceOfSale         DOUBLE NOT NULL,
@@ -111,11 +111,28 @@ CREATE TABLE Product (
 	CurrentQuantity     DOUBLE NOT NULL,
 	IDBrand             INT NOT NULL,
 
-	PRIMARY KEY(CodeBar),
+	PRIMARY KEY(ID),
 	UNIQUE(Name),
 
 	FOREIGN KEY (IDBrand)
 		REFERENCES Brand(ID)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+);
+
+/* ======================================================
+ * =================  BAR CODE    =======================
+ * ======================================================
+ */
+CREATE TABLE Barcode (
+	Barcode     VARCHAR(15) NOT NULL,
+	ProductID   INT NOT NULL,
+
+	PRIMARY KEY(Barcode),
+	UNIQUE(Barcode),
+
+	FOREIGN KEY (ProductID)
+		REFERENCES Product(ID)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
@@ -145,18 +162,18 @@ CREATE TABLE Sale (
  */
 CREATE TABLE UnitSale (
 	SaleID              INT NOT NULL,
-	ProductCodeBar      VARCHAR(15) NOT NULL,
+	ProductID           INT NOT NULL,
 	QuantitySell        DOUBLE NOT NULL,
 
-	PRIMARY KEY(SaleID, ProductCodeBar),
+	PRIMARY KEY(SaleID, ProductID),
 
 	FOREIGN KEY (SaleID)
 		REFERENCES Sale(ID)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
 
-	FOREIGN KEY (ProductCodeBar)
-		REFERENCES Product(CodeBar)
+	FOREIGN KEY (ProductID)
+		REFERENCES Product(ID)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );

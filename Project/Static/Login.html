@@ -43,18 +43,11 @@
 
 </HEAD>
 
-    
   <BODY>
-    <div id="ReactApp" />
-    <script> const UserName = "{{ session['UserName'] }}" </script>
-    <script src="{{ url_for('static', filename = 'bundle.js') }}" type="text/javascript"></script>
+        <form action= "" method = "post">
+          <p><input type="text" name="UserName" /></p>
+          <p><input type="submit" value="Login" /></p>
+       </form>
   </BODY>
 
-  <style>
-    *:focus {
-        outline: 0;
-    }
-  </style>
-
-  
 </HTML>

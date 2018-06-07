@@ -1,8 +1,10 @@
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #|||||||||||||||||||||||           SALES PAGE       ||||||||||||||||||||||||||||||||||||||||
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-from flask import Flask, render_template, request, json
+
+from flask import Flask, render_template, request, json, session, redirect, url_for
 import pymysql.cursors
+from flask_session import Session
 
 #==========================================================================
 #=================     START AND CONFIGURE THE WEB APP     ================
@@ -17,8 +19,15 @@ WebApp = Flask(
             template_folder = "../Static",
         )
 
+WebApp.config['SESSION_USE_SIGNER'] = True
+WebApp.config['SESSION_FILE_THRESHOLD'] = 500
+WebApp.config['SESSION_FILE_DIR'] = "FlaskSessions"
+WebApp.config['SESSION_TYPE'] = 'filesystem'
+WebApp.config['PERMANENT_SESSION_LIFETIME'] = 86400
+
 WebApp.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 WebApp.config['TEMPLATES_AUTO_RELOAD'] = True
+WebApp.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 #++++++++++++++++++++++++++++++++++++++++++++
@@ -31,17 +40,11 @@ Connection = pymysql.connect(
     db       = 'tdetiendita'
 )
 
+Session(WebApp)
 
 #==========================================================================
 #======================         ROUTES           ==========================
 #==========================================================================
-
-#++++++++++++++++++++++++++++++++++++++++++++
-#+++++++          ROUT: INDEX        ++++++++
-#++++++++++++++++++++++++++++++++++++++++++++
-@WebApp.route("/")
-def index():
-    return render_template("index.html")
 
 
 #++++++++++++++++++++++++++++++++++++++++++++
@@ -54,8 +57,8 @@ def DataFromBarCode():
     if BarCode == None: return json.dumps({"Error": f"Error con el código de barras"})
 
     with Connection.cursor() as Cursor:
-        SQLQuery = "SELECT PriceOfSale, Name from Product WHERE CodeBar = %s"
-        Cursor.execute(SQLQuery, BarCode)
+        SQLQuery = "SELECT PriceOfSale, Name from Product WHERE CodeBar = %s;"
+        Cursor.execute(SQLQuery, (BarCode,) )
         Results = Cursor.fetchone()
 
         if Results == None: 
@@ -73,11 +76,39 @@ def SaleProducts():
     Data = request.json
     print(Data)
 
-    return json.dumps({"Result": "Happy"}) 
+    return json.dumps({"Result": "HWebAppy"}) 
 
 
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++          ROUT: INDEX        ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
+@WebApp.route('/')
+def index():
+    
+    User = session.get('UserName', None)
+
+    print(session)
+
+    if User:
+        return render_template("index.html")
+    else:
+        return redirect(url_for('Login'))
 
 
+@WebApp.route('/login', methods = ['GET', 'POST'])
+def Login():
+    if request.method == 'POST':
+        print(request.form)
+        session['UserName'] = str(request.form['UserName'])
+        print(str(session) + "session en login")
+        return redirect(url_for('index'))
+    else:
+        return render_template("Login.html")
+
+@WebApp.route('/logout')
+def Logout():
+    session.clear()
+    return "listo"
 
 
 
