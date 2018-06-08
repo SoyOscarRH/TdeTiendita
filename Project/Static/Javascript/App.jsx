@@ -5,7 +5,8 @@ import {HotKeys} from "react-hotkeys"
 import AppHeader from "./AppHeader"
 import AppFooter from "./AppFooter"
 import SalesPage from "./SalesPage"
-import Products from "./Products"
+import Home from "./Home"
+import EditProduct from "./EditProduct"
 
 const Pages = {
     SalesPage: {
@@ -18,11 +19,7 @@ const Pages = {
     }
 }
 
-const Home = () => (
-    <div>
-        <span> Mira, funciono </span>
-    </div>
-)
+
 
 
 // =====================================================================
@@ -32,7 +29,7 @@ export default class App extends React.Component {
     render () {
         return (
             <HotKeys 
-                    keyMap   = {{ToogleBar: 'b'}}
+                    keyMap   = {{ToogleBar: 'ctrl+b'}}
                     handlers = {{ToogleBar: () => document.getElementById('ToogleSideBar').click()}}>
                 <header>
                     <AppHeader Page={Pages.SalesPage} />
@@ -43,7 +40,7 @@ export default class App extends React.Component {
                         <Switch>
                           <Route exact path='/' component={Home}/>
                           <Route path='/SalesPage' component={SalesPage}/>
-                          <Route path='/Products' component={Products}/>
+                          <Route path='/EditProduct' component={EditProduct}/>
                         </Switch>
                     </div>
                 </main>

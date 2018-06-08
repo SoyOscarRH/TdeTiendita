@@ -46,39 +46,6 @@ Session(WebApp)
 #======================         ROUTES           ==========================
 #==========================================================================
 
-
-#++++++++++++++++++++++++++++++++++++++++++++
-#+++++++    DATA FROM BAR CODE       ++++++++
-#++++++++++++++++++++++++++++++++++++++++++++
-@WebApp.route("/DataFromBarCode", methods=['POST'])
-def DataFromBarCode():
-    
-    BarCode = request.json.get('BarCodeInput')
-    if BarCode == None: return json.dumps({"Error": f"Error con el código de barras"})
-
-    with Connection.cursor() as Cursor:
-        SQLQuery = "SELECT PriceOfSale, Name from Product WHERE CodeBar = %s;"
-        Cursor.execute(SQLQuery, (BarCode,) )
-        Results = Cursor.fetchone()
-
-        if Results == None: 
-            return json.dumps({"Error": f"No hay producto con código de barras {BarCode}"})
-        else:
-            return json.dumps({"UnitPrice": Results[0], "BarCode": BarCode, "Name": Results[1]})
-
-
-#++++++++++++++++++++++++++++++++++++++++++++
-#+++++++    DATA FROM BAR CODE       ++++++++
-#++++++++++++++++++++++++++++++++++++++++++++
-@WebApp.route("/SaleProducts", methods=['POST'])
-def SaleProducts():
-    
-    Data = request.json
-    print(Data)
-
-    return json.dumps({"Result": "HWebAppy"}) 
-
-
 #++++++++++++++++++++++++++++++++++++++++++++
 #+++++++          ROUT: INDEX        ++++++++
 #++++++++++++++++++++++++++++++++++++++++++++
@@ -95,6 +62,65 @@ def index():
         return redirect(url_for('Login'))
 
 
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++    DATA FROM BAR CODE       ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
+@WebApp.route("/GetProductDataFromBarCode", methods=['POST'])
+def GetProductDataFromBarCode():
+    
+    BarCode = request.json.get('BarCodeInput', None)
+    if BarCode == None: return json.dumps({"Error": f"Error con el código de barras"})
+
+    with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
+        Cursor.execute("CALL GetProductDataFromBarCode(%s);", (BarCode,) )
+        Results = Cursor.fetchone()
+
+        if Results == None: 
+            return json.dumps({"Error": f"No hay producto con código de barras {BarCode}"})
+        else:
+            return json.dumps(Results)
+
+
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++    DATA FROM PRODUCT FROM ??    ++++++
+#++++++++++++++++++++++++++++++++++++++++++++
+@WebApp.route("/GetAllProductData", methods=['POST'])
+def GetAllProductData():
+    ProductQuery = request.json.replace(" ", "%")
+
+    with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
+        Cursor.execute("CALL GetAllProductData(%s);", (ProductQuery,) )
+        Results = Cursor.fetchall()
+
+        if Results == (): 
+            return json.dumps({"Error": f"No hay producto con esas características"})
+        else:
+            return json.dumps(Results)
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++    DATA FROM BAR CODE       ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
+@WebApp.route("/SaleProducts", methods=['POST'])
+def SaleProducts():
+    
+    Data = request.json
+    print(Data)
+
+    return json.dumps({"Result": "All ok"}) 
+
+
+
+
+
+
+
+
+
+
+
+
 @WebApp.route('/login', methods = ['GET', 'POST'])
 def Login():
     if request.method == 'POST':
@@ -109,6 +135,10 @@ def Login():
 def Logout():
     session.clear()
     return "listo"
+
+
+
+
 
 
 

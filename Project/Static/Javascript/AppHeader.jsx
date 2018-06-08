@@ -68,7 +68,16 @@ export default class AppHeader extends React.Component {
                             </div>
                         </div>
                     </li>
-
+                    <li><a className="subheader">Enlances</a></li>
+                    <li>
+                        <Link 
+                            className = "waves-effect" 
+                            to        = '/' 
+                            onClick   = {() => M.Sidenav.getInstance(document.getElementById("SideMenu")).close()}>
+                            <i className="material-icons">home</i>
+                            Página de Inicio
+                        </Link>
+                    </li>
                     <li><a className="subheader">Analíticas</a></li>
                     <li>
                         <a className="waves-effect" href="#!">
@@ -87,21 +96,27 @@ export default class AppHeader extends React.Component {
 
                     <li><a className="subheader">Productos</a></li>
                     <li>
-                        <Link className="waves-effect" to='/SalesPage'>
+                        <Link 
+                            className = "waves-effect" 
+                            to        = '/SalesPage' 
+                            onClick   = {() => M.Sidenav.getInstance(document.getElementById("SideMenu")).close()}>
                             <i className="material-icons">attach_money</i>
                             Página de Ventas
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            className = "waves-effect" 
+                            to        = '/EditProduct' 
+                            onClick   = {() => M.Sidenav.getInstance(document.getElementById("SideMenu")).close()}>
+                            <i className="material-icons">edit</i>
+                            Editar Productos
                         </Link>
                     </li>
                     <li>
                         <a className="waves-effect" href="#!">
                             <i className="material-icons">add_circle</i>
                             Añadir Productos
-                        </a>
-                    </li>
-                    <li>
-                        <a className="waves-effect" href="#!">
-                            <i className="material-icons">edit</i>
-                            Editar Productos
                         </a>
                     </li>
                 </ul>

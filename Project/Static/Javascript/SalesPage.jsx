@@ -7,7 +7,6 @@ import {SentData} from "./CoolFunctions.js"
 
 
 
-
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 // ||||||||||||           SALES PAGE       |||||||||||||||||||||||||||||
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -60,11 +59,12 @@ export default class SalesPage extends React.Component {
                     </div>
                 )
 
-                this.props.ShowErrorMessage(ErrorMessage)
+                this.ShowErrorMessage(ErrorMessage)
                 return
             }
 
             this.setState({"Products": []})
+            M.toast({html: 'Venta Realizada'})
             this.SectionToAddNewProduct.current.handleChangeOfFocus({Position: 'BarCodeInput'})
         })
         .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
@@ -160,7 +160,7 @@ export default class SalesPage extends React.Component {
                 {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                 <HotKeys 
                     keyMap   = {{CloseModal: 'enter'}}
-                    handlers = {{CloseModal: (e) => {InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal')).close()}}}>
+                    handlers = {{CloseModal: (e) => {M.Modal.getInstance(document.getElementById('ErrorModal')).close()}}}>
                     
                     <div id="ErrorModal" className="modal modal-fixed-footer" style={{width: '70%'}} >
                         <div className="modal-content">
@@ -349,7 +349,7 @@ class SectionToAddNewProduct extends React.Component {
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // ++++++     SEND TO FIND THE PRICE AND NAME     +++++++++
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        SentData('/DataFromBarCode', Sale)
+        SentData('/GetProductDataFromBarCode', Sale)
         .then(Results => {
 
             // ++++++++++++++++++++++++++++++++++++++++++++
@@ -386,7 +386,7 @@ class SectionToAddNewProduct extends React.Component {
 
                 const Product = {
                     Quantity: NewQuantity,
-                    Code: Results['BarCode'],
+                    Code: Results['Barcode'],
                     Name: Results['Name'],
                     UnitPrice: Results['UnitPrice'],
                 }

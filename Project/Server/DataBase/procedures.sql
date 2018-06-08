@@ -1,26 +1,72 @@
 USE TdeTiendita;
 
 /* ======================================================
- * =================  EMPLOYEES   =======================
+ * =====      GET PRODUCT DATA FROM BARCODE      ========
  * ======================================================
  */
 DROP PROCEDURE IF EXISTS GetProductDataFromBarCode;
+
 DELIMITER //
-CREATE PROCEDURE GetProductDataFromBarCode
-    (IN Barcode VARCHAR(15), 
-    OUT PriceOfSale DOUBLE, OUT Name VARCHAR(100))
+CREATE PROCEDURE GetProductDataFromBarCode(IN ThisBarcode VARCHAR(15))
 BEGIN
-    DECLARE EXIT HANDLER FOR 1062
-    BEGIN
-        SET salida = 0;
-        ROLLBACK;
-    END;
-    START TRANSACTION;
-        SELECT PriceOfSale, Name from Product WHERE CodeBar = (Barcode);
-    COMMIT;
-    SET salida = 1;
+    SELECT PriceOfSale as UnitPrice, Name, Barcode FROM Product, Barcode 
+        WHERE 
+            Barcode.Barcode = (ThisBarcode) AND 
+            Barcode.ProductID = Product.ID;
 END //
+
 DELIMITER ;
+
+/* ======================================================
+ * =====      GET PRODUCT DATA FROM BARCODE      ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS GetAllProductData;
+DELIMITER |
+CREATE PROCEDURE GetAllProductData(IN ProductQuery VARCHAR(15))
+BEGIN
+    SELECT 
+        Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
+        Brand.Name AS BrandName, Provider.Name AS ProviderName
+            FROM Product, Barcode, Brand, Provider
+            WHERE 
+                Product.Name LIKE CONCAT('%', ProductQuery, '%') 
+                AND
+                (
+                    Barcode.ProductID = Product.ID      AND
+                    Product.IDBrand   = Brand.ID        AND
+                    Brand.ProviderID  = Provider.ID
+                )
+    UNION
+    SELECT 
+        Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
+        Brand.Name AS BrandName, Provider.Name AS ProviderName
+            FROM Product, Barcode, Brand, Provider
+            WHERE 
+                Product.Description LIKE CONCAT('%', ProductQuery, '%')
+                AND
+                (
+                    Barcode.ProductID = Product.ID      AND
+                    Product.IDBrand   = Brand.ID        AND
+                    Brand.ProviderID  = Provider.ID
+                )
+    UNION
+    SELECT 
+        Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
+        Brand.Name AS BrandName, Provider.Name AS ProviderName
+            FROM Product, Barcode, Brand, Provider
+            WHERE 
+                Barcode.Barcode LIKE CONCAT('%', ProductQuery, '%')
+                AND
+                (
+                    Barcode.ProductID = Product.ID      AND
+                    Product.IDBrand   = Brand.ID        AND
+                    Brand.ProviderID  = Provider.ID
+                );
+
+END |
+DELIMITER ;
+
 
 
 /*
