@@ -27,7 +27,7 @@ export default class AppHeader extends React.Component {
                             
                             {/*+++++++++++   NAME OF PAGE   ++++++++++++*/}
                             <div className="brand-logo white-text center" style={{fontSize: '1.5rem'}}>
-                                {this.props.Page.Name}
+                                T de Tiendita
                             </div>
 
                             {/*+++++++++++   LINK TO HOME   ++++++++++++*/}

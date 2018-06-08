@@ -8,18 +8,6 @@ import SalesPage from "./SalesPage"
 import Home from "./Home"
 import EditProduct from "./EditProduct"
 
-const Pages = {
-    SalesPage: {
-        Name: "Página de Ventas",
-        MiniName: "Ventas",
-        Links: [
-            ["Home", ".... :0"],
-        ]
-
-    }
-}
-
-
 
 
 // =====================================================================
@@ -32,7 +20,7 @@ export default class App extends React.Component {
                     keyMap   = {{ToogleBar: 'ctrl+b'}}
                     handlers = {{ToogleBar: () => document.getElementById('ToogleSideBar').click()}}>
                 <header>
-                    <AppHeader Page={Pages.SalesPage} />
+                    <AppHeader />
                 </header>
                 <main>
                     <div className="container">
