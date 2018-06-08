@@ -55,7 +55,7 @@ export default class AppHeader extends React.Component {
                         <div className="user-view">
                             <div className="container">
                                 <h5 className="white-text" style={{fontWeight: 300}}>
-                                    Menú de <b>{this.props.Page.MiniName}</b>
+                                    Menú de <b> Páginas</b>
                                 </h5>
                                 
                                 <div className="background">
