@@ -24,7 +24,7 @@ export default class AppHeader extends React.Component {
                 <div className="navbar-fixed">
                     <nav className="indigo darken-2">
                         <div className="nav-wrapper container">
-                            
+
                             {/*+++++++++++   NAME OF PAGE   ++++++++++++*/}
                             <div className="brand-logo white-text center" style={{fontSize: '1.5rem'}}>
                                 T de Tiendita
@@ -34,7 +34,7 @@ export default class AppHeader extends React.Component {
                             <Link to='/' className="brand-logo right">
                                 <i className="material-icons white-text">home</i>
                             </Link>
-                            
+
 
                             {/*+++++++++++      MENU       ++++++++++++++*/}
                             <a id="ToogleSideBar" data-target="SideMenu" className="sidenav-trigger show-on-large">
@@ -50,18 +50,18 @@ export default class AppHeader extends React.Component {
                 {/*================      SIDE NAV        ===================*/}
                 {/*=========================================================*/}
                 <ul id="SideMenu" className="sidenav">
-                    
+
                     <li>
                         <div className="user-view">
                             <div className="container">
                                 <h5 className="white-text" style={{fontWeight: 300}}>
                                     Menú de <b> Páginas</b>
                                 </h5>
-                                
+
                                 <div className="background">
                                   <img src="/Distribution/Graphics/BackgroundBlue.jpg" />
                                 </div>
-                                
+
                                 <a href="#user"><img className="circle" src="/Distribution/Graphics/BackgroundBlue.jpg" /></a>
                                 <a href="#name"><span className="white-text name">{UserName}</span></a>
                                 <a href="#email"><span className="white-text email">Pepito@perez.com</span></a>
@@ -70,9 +70,9 @@ export default class AppHeader extends React.Component {
                     </li>
                     <li><a className="subheader">Enlances</a></li>
                     <li>
-                        <Link 
-                            className = "waves-effect" 
-                            to        = '/' 
+                        <Link
+                            className = "waves-effect"
+                            to        = '/'
                             onClick   = {() => M.Sidenav.getInstance(document.getElementById("SideMenu")).close()}>
                             <i className="material-icons">home</i>
                             Página de Inicio
@@ -96,18 +96,18 @@ export default class AppHeader extends React.Component {
 
                     <li><a className="subheader">Productos</a></li>
                     <li>
-                        <Link 
-                            className = "waves-effect" 
-                            to        = '/SalesPage' 
+                        <Link
+                            className = "waves-effect"
+                            to        = '/SalesPage'
                             onClick   = {() => M.Sidenav.getInstance(document.getElementById("SideMenu")).close()}>
                             <i className="material-icons">attach_money</i>
                             Página de Ventas
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            className = "waves-effect" 
-                            to        = '/EditProduct' 
+                        <Link
+                            className = "waves-effect"
+                            to        = '/EditProduct'
                             onClick   = {() => M.Sidenav.getInstance(document.getElementById("SideMenu")).close()}>
                             <i className="material-icons">edit</i>
                             Editar Productos
@@ -121,8 +121,8 @@ export default class AppHeader extends React.Component {
                     </li>
                 </ul>
 
-                
-                
+
+
 
             </div>
         );
