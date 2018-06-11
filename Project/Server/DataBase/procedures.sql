@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS GetProductDataFromBarCode;
 DELIMITER //
 CREATE PROCEDURE GetProductDataFromBarCode(IN ThisBarcode VARCHAR(15))
 BEGIN
-    SELECT PriceOfSale as UnitPrice, Name, Barcode FROM Product, Barcode 
+    SELECT PriceOfSale as UnitPrice, Name FROM Product, Barcode 
         WHERE 
             Barcode.Barcode = (ThisBarcode) AND 
             Barcode.ProductID = Product.ID;
@@ -18,12 +18,12 @@ END //
 DELIMITER ;
 
 /* ======================================================
- * =====      GET PRODUCT DATA FROM BARCODE      ========
+ * =====            GET PRODUCT DATA             ========
  * ======================================================
  */
-DROP PROCEDURE IF EXISTS GetAllProductData;
+DROP PROCEDURE IF EXISTS GetAllProductDataExceptBarcode;
 DELIMITER |
-CREATE PROCEDURE GetAllProductData(IN ProductQuery VARCHAR(15))
+CREATE PROCEDURE GetAllProductDataExceptBarcode(IN ProductQuery VARCHAR(15))
 BEGIN
     SELECT 
         Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
@@ -67,6 +67,21 @@ BEGIN
 END |
 DELIMITER ;
 
+
+/* ======================================================
+ * =====      GET ALL BARCODES FROM PRODUCT 1    ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS GetAllBarcodesFromProductID;
+
+DELIMITER //
+CREATE PROCEDURE GetAllBarcodesFromProductID(IN ProductID INT)
+BEGIN
+    SELECT Barcode FROM Barcode 
+        WHERE Barcode.ProductID = ProductID;
+END //
+
+DELIMITER ;
 
 
 /*

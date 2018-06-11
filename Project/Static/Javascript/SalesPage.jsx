@@ -38,6 +38,7 @@ export default class SalesPage extends React.Component {
     handleSendSale() {
         SentData('/SaleProducts', this.state.Products)
         .then(Results => {
+            
             // ++++++++++++++++++++++++++++++++++++++++++++
             // ++++++          IF NOT FIND        +++++++++
             // ++++++++++++++++++++++++++++++++++++++++++++
@@ -69,7 +70,7 @@ export default class SalesPage extends React.Component {
 
     /* 
      * Should send a Object:
-     * Product = {Quantity: 20, Code: "tor", Name: "tor", UnitPrice: 20.5}
+     * Product = {Quantity: 20, Name: "Tortilla", UnitPrice: 20.5}
      */
     AddProduct(NewProduct) {
         const Products = [...this.state.Products]
@@ -80,7 +81,7 @@ export default class SalesPage extends React.Component {
         // ++++++++++++++++++++++++++++++++++++++++++++
         const ExistAlready = Products.some(
             (Product) => {
-                if (Product['Code'] === NewProduct['Code']) {
+                if (Product['Name'] === NewProduct['Name']) {
                     Product['Quantity'] += NewProduct['Quantity']
                     return true
                 }
@@ -96,7 +97,6 @@ export default class SalesPage extends React.Component {
                 Quantity:  NewProduct['Quantity'],
                 UnitPrice: NewProduct['UnitPrice'],
                 Name:      NewProduct['Name'],
-                Code:      NewProduct['Code'],
             })
         }
 
@@ -320,7 +320,7 @@ class SectionToAddNewProduct extends React.Component {
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // ++++++     SEND TO FIND THE PRICE AND NAME     +++++++++
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        SentData('/GetProductDataFromBarCode', Sale)
+        SentData('/GetProductDataFromBarCode', Sale.BarCodeInput)
         .then(Results => {
 
             // ++++++++++++++++++++++++++++++++++++++++++++
@@ -357,7 +357,6 @@ class SectionToAddNewProduct extends React.Component {
 
                 const Product = {
                     Quantity: NewQuantity,
-                    Code: Results['Barcode'],
                     Name: Results['Name'],
                     UnitPrice: Results['UnitPrice'],
                 }
@@ -501,18 +500,18 @@ class SectionToAddNewProduct extends React.Component {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 function ProductsTable(props) {
 
+    const DeleteItem = (Product) => {
+        props.handleSetState((PrevState) => {
+            const NewProducts = PrevState.Products.filter(Item => Item.Code !== Product.Code)
+            return {"Products": NewProducts}
+        })
+    }
+
     const TableProductsItems = props.Products.map( (Product) => {
 
         let VisualQuantity = (Number.isInteger(Product.Quantity))? 
             Product.Quantity: 
             Product.Quantity.toFixed(3)
-
-        const DeleteItem = (Product) => {
-            props.handleSetState((PrevState) => {
-                const NewProducts = PrevState.Products.filter(Item => Item.Code !== Product.Code)
-                return {"Products": NewProducts}
-            })
-        }
 
         return (
             <tr key={Product.Code}>

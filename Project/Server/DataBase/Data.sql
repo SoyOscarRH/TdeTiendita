@@ -37,6 +37,7 @@ USE TdeTiendita;
 	 */
   	INSERT INTO Barcode VALUES 
 	    ("TOR", 1),
+	    ("TORTI", 1),
 	    ("TOT", 2);
 
 	  

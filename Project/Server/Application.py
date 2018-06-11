@@ -68,7 +68,7 @@ def index():
 @WebApp.route("/GetProductDataFromBarCode", methods=['POST'])
 def GetProductDataFromBarCode():
     
-    BarCode = request.json.get('BarCodeInput', None)
+    BarCode = request.json
     if BarCode == None: return json.dumps({"Error": f"Error con el código de barras"})
 
     with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
@@ -84,12 +84,12 @@ def GetProductDataFromBarCode():
 #++++++++++++++++++++++++++++++++++++++++++++
 #+++++    DATA FROM PRODUCT FROM ??    ++++++
 #++++++++++++++++++++++++++++++++++++++++++++
-@WebApp.route("/GetAllProductData", methods=['POST'])
-def GetAllProductData():
+@WebApp.route("/GetAllProductDataExceptBarcode", methods=['POST'])
+def GetAllProductDataExceptBarcode():
     ProductQuery = request.json.replace(" ", "%")
 
     with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
-        Cursor.execute("CALL GetAllProductData(%s);", (ProductQuery,) )
+        Cursor.execute("CALL GetAllProductDataExceptBarcode(%s);", (ProductQuery,) )
         Results = Cursor.fetchall()
 
         if Results == (): 
