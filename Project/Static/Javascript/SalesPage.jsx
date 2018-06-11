@@ -4,7 +4,7 @@
 import React from "react"
 import {HotKeys} from "react-hotkeys"
 import {SentData} from "./CoolFunctions.js"
-
+import ErrorModal from "./ErrorModal"
 
 
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -24,11 +24,8 @@ export default class SalesPage extends React.Component {
             Products:     [],
         }
 
+        this.ErrorModal = React.createRef()
         this.SectionToAddNewProduct = React.createRef()
-    }
-
-    componentDidMount() {
-        M.Modal.init(document.getElementById('ErrorModal'), {dismissible: true, inDuration: 80, outDuration: 80})
     }
 
     // =========================================================
@@ -59,7 +56,7 @@ export default class SalesPage extends React.Component {
                     </div>
                 )
 
-                this.ShowErrorMessage(ErrorMessage)
+                this.ErrorModal.current.ShowErrorMessage(ErrorMessage)
                 return
             }
 
@@ -68,16 +65,6 @@ export default class SalesPage extends React.Component {
             this.SectionToAddNewProduct.current.handleChangeOfFocus({Position: 'BarCodeInput'})
         })
         .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
-    }
-
-    /* 
-     * Show a Modal and call CallbackOnClose when close 
-     */
-    ShowErrorMessage(Message, CallbackOnClose) {
-        this.setState({ErrorMessage: Message})
-        const InstanceModal = M.Modal.getInstance(document.getElementById('ErrorModal'))
-        InstanceModal.options.onCloseEnd = CallbackOnClose
-        InstanceModal.open()
     }
 
     /* 
@@ -139,7 +126,7 @@ export default class SalesPage extends React.Component {
                 <div className="section">
                     <SectionToAddNewProduct 
                         ref              = {this.SectionToAddNewProduct}
-                        ShowErrorMessage = {(Message, CallbackOnClose) => this.ShowErrorMessage(Message, CallbackOnClose)}
+                        ShowErrorMessage = {(Message, CallbackOnClose) => this.ErrorModal.current.ShowErrorMessage(Message, CallbackOnClose)}
                         AddProduct       = {(Product) => this.AddProduct(Product)}
                         AutoFocus        = {true}
                     />
@@ -158,23 +145,7 @@ export default class SalesPage extends React.Component {
                 {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                 {/*+++++++++          ERROR MODAL           ++++++++++++*/}
                 {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
-                <HotKeys 
-                    keyMap   = {{CloseModal: 'enter'}}
-                    handlers = {{CloseModal: (e) => {M.Modal.getInstance(document.getElementById('ErrorModal')).close()}}}>
-                    
-                    <div id="ErrorModal" className="modal modal-fixed-footer" style={{width: '70%'}} >
-                        <div className="modal-content">
-                            <h4>Error</h4>
-                            {this.state.ErrorMessage}
-                        </div>
-                        <div className="modal-footer">
-                            <a className="btn-flat modal-close waves-effect waves-red red lighten-2">
-                                <span className="white-text">Salir</span>
-                            </a>
-                        </div>
-                    </div>
-
-                </HotKeys>
+                <ErrorModal ref={this.ErrorModal} />
 
             </div>
         )

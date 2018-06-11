@@ -54,6 +54,15 @@ export default class Home extends React.Component {
                                 to        = '/SalesPage'>
                                 Página de Ventas
                             </Link>
+
+                            <br />
+                            <br />
+                            
+                            <Link 
+                                className = "waves-effect waves-light btn-large blue lighten-1"
+                                to        = '/EditProduct'>
+                                Editar Productos
+                            </Link>
                         </div> 
                     </div>
                 </div>

@@ -77,43 +77,50 @@ export default class EditProduct extends React.Component {
             return (
                 <li key={Product.Name}>
                     <div className="collapsible-header">
-                        <div className="left-align">
+                        <div className="left-align" style={{fontSize: '1.5rem'}}>
                             {Product.Name}
                         </div>
-                        <div className="right-align">
-                            <i className="material-icons">create</i>
-                        </div>
                     </div>
-                    <div className="collapsible-body left-align blue-grey-text text-darken-3">
+                    <div className="collapsible-body blue-grey-text text-darken-3">
 
-                        <span style={{fontSize: '1.15rem'}}>
-                            {Product.Description}
-                        </span>
+                        <div className="row">
+                            <div className="col s10 m8 l8">
+                                <div className="left-align">
+                                    <span style={{fontSize: '1.15rem'}}>
+                                        {Product.Description}
+                                    </span>
 
-                        <ul>
-                            <li>
-                                <strong>Marca: </strong>
-                                {Product.BrandName}
-                            </li>
-                            <li>
-                                <strong>Proovedor: </strong>
-                                {Product.ProviderName}
-                            </li>
-                        </ul>
+                                    <ul>
+                                        <li>
+                                            <strong>Marca: </strong>
+                                            {Product.BrandName}
+                                        </li>
+                                        <li>
+                                            <strong>Proovedor: </strong>
+                                            {Product.ProviderName}
+                                        </li>
+                                    </ul>
 
-                        <br />
-                        <br />
-
-                        <div className="right-align">
-                            <div className="chip">
-                                <strong>Precio Unitario de Venta: </strong>
-                                {Product.PriceOfSale}
+                                    <br />
+                                    <br />
+                                </div>
+                                <div className="right-align">
+                                    <div className="chip">
+                                        <strong>Precio Unitario de Venta: </strong>$
+                                        {Product.PriceOfSale}
+                                    </div>
+                                    <div className="chip">
+                                        <strong>Precio Unitario de Adquisición: </strong>$
+                                        {Product.PriceAcquisition}
+                                    </div>
+                                </div>
                             </div>
-                            <div className="chip">
-                                <strong>Precio Unitario de Adquisición: </strong>
-                                {Product.PriceAcquisition}
+                            <div className="col s4 m2 l2">
+                                <a className="waves-effect waves-light btn-large red lighten-2">
+                                    Editar
+                                </a>                            
                             </div>
-                        </div>
+                        </div> 
                     </div>
                 </li>
             )
@@ -128,58 +135,55 @@ export default class EditProduct extends React.Component {
                         keyMap   = {{SendProductQuery: 'enter'}}
                         handlers = {{SendProductQuery: () => this.handleSendQuery(), }}>
 
-                    <div className="container">
-                        
-                        <div className="row center-align">
-                            <div className="card-panel grey lighten-4 col s12">
+                    <div className="row center-align">
+                        <div className="card-panel grey lighten-4 col s12">
 
-                                <div className="container">
-                                    <h4 className="grey-text text-darken-2">
-                                        <b>Ve y Modifica </b> información de un Producto
-                                    </h4>
-                                    <br />
-                                    <span className="grey-text">
-                                        Busca por código de barras, por nombre o por descripción
-                                    </span>
-                                    <br />
-                                    <br />
+                            <div className="container">
+                                <h4 className="grey-text text-darken-2">
+                                    <b>Ve y Modifica </b> información de un Producto
+                                </h4>
+                                <br />
+                                <span className="grey-text">
+                                    Busca por código de barras, por nombre o por descripción
+                                </span>
+                                <br />
+                                <br />
 
-                                    <div className="row">
-                                        <div className="input-field col s8 offset-s1">
-                                            <input
-                                                autoFocus = {true} 
-                                                id        = "ProductQueryInput" 
-                                                type      = "text"
-                                                value     = {this.state.ProductQuery}
-                                                onChange  = {(e) => this.setState({ProductQuery: e.target.value})}
-                                            />
-                                        </div>
-                                        <div className="input-field col s2">
-                                            <button 
-                                                onClick ={() => this.handleSendQuery()}
-                                                className = "waves-effect btn-floating waves-light green btn-flat">
-                                                <i className="material-icons">
-                                                    search
-                                                </i>
-                                            </button>
-                                        </div>
+                                <div className="row">
+                                    <div className="input-field col s8 offset-s1">
+                                        <input
+                                            autoFocus = {true} 
+                                            id        = "ProductQueryInput" 
+                                            type      = "text"
+                                            value     = {this.state.ProductQuery}
+                                            onChange  = {(e) => this.setState({ProductQuery: e.target.value})}
+                                        />
                                     </div>
-
-                                    <div className={this.state.Products.length === 0? " hide": ""}>
-                                        <ul className={"collapsible"}>
-                                            {CollapsibleData}
-                                        </ul>
-                                        <br />
-                                        <br />
+                                    <div className="input-field col s2">
+                                        <button 
+                                            onClick ={() => this.handleSendQuery()}
+                                            className = "waves-effect btn-floating waves-light green btn-flat">
+                                            <i className="material-icons">
+                                                search
+                                            </i>
+                                        </button>
                                     </div>
-
                                 </div>
-                                
+
+                                <div className={this.state.Products.length === 0? " hide": ""}>
+                                    <ul className={"collapsible"}>
+                                        {CollapsibleData}
+                                    </ul>
+                                    <br />
+                                    <br />
+                                </div>
 
                             </div>
-                        </div>
+                            
 
+                        </div>
                     </div>
+
                 </HotKeys>
 
                 {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
