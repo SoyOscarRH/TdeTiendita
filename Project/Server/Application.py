@@ -84,19 +84,27 @@ def GetProductDataFromBarCode():
 #++++++++++++++++++++++++++++++++++++++++++++
 #+++++    DATA FROM PRODUCT FROM ??    ++++++
 #++++++++++++++++++++++++++++++++++++++++++++
-@WebApp.route("/GetAllProductDataExceptBarcode", methods=['POST'])
-def GetAllProductDataExceptBarcode():
+@WebApp.route("/GetAllProductData", methods=['POST'])
+def GetAllProductData():
+    
     ProductQuery = request.json.replace(" ", "%")
 
     with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
         Cursor.execute("CALL GetAllProductDataExceptBarcode(%s);", (ProductQuery,) )
-        Results = Cursor.fetchall()
+        ProductsData = Cursor.fetchall()
 
-        if Results == (): 
+        if ProductsData == (): 
             return json.dumps({"Error": f"No hay producto con esas características"})
-        else:
-            return json.dumps(Results)
+        
+        RealData = []
 
+        for ProductData in ProductsData:
+            Cursor.execute("CALL GetAllBarcodesFromProductID(%s);", (ProductData['ID'],) )
+            BarCodes = Cursor.fetchall()
+            BarCodes = [Code['Barcode'] for Code in BarCodes]
+            RealData.append({**ProductData, "BarCodes": BarCodes}) 
+
+        return json.dumps(RealData)
 
 
 #++++++++++++++++++++++++++++++++++++++++++++

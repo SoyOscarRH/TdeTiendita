@@ -50,6 +50,7 @@ export default class EditProduct extends React.Component {
                         </div>
                     )
 
+                    console.log(Results)
                     this.setState({Products: []})
 
                     this.ErrorModal.current.ShowErrorMessage(
@@ -59,6 +60,7 @@ export default class EditProduct extends React.Component {
                     return
                 }
                 else {
+                    console.log(Results)
                     this.setState({Products: Results})
                 }
             })
@@ -179,8 +181,6 @@ export default class EditProduct extends React.Component {
                                 </div>
 
                             </div>
-                            
-
                         </div>
                     </div>
 

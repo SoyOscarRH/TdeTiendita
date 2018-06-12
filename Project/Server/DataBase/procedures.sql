@@ -26,7 +26,7 @@ DELIMITER |
 CREATE PROCEDURE GetAllProductDataExceptBarcode(IN ProductQuery VARCHAR(15))
 BEGIN
     SELECT 
-        Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
+        Product.ID, Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
         Brand.Name AS BrandName, Provider.Name AS ProviderName
             FROM Product, Barcode, Brand, Provider
             WHERE 
@@ -39,7 +39,7 @@ BEGIN
                 )
     UNION
     SELECT 
-        Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
+        Product.ID, Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
         Brand.Name AS BrandName, Provider.Name AS ProviderName
             FROM Product, Barcode, Brand, Provider
             WHERE 
@@ -52,7 +52,7 @@ BEGIN
                 )
     UNION
     SELECT 
-        Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
+        Product.ID, Product.Name, Description, PriceOfSale, PriceAcquisition, CurrentQuantity, 
         Brand.Name AS BrandName, Provider.Name AS ProviderName
             FROM Product, Barcode, Brand, Provider
             WHERE 

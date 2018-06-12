@@ -141,6 +141,11 @@ export default class SalesPage extends React.Component {
                     <ProductsTable Products={this.state.Products} handleSetState={(Function) => this.setState(Function)}/>
                 </div>
 
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
 
                 {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                 {/*+++++++++          ERROR MODAL           ++++++++++++*/}
@@ -502,7 +507,7 @@ function ProductsTable(props) {
 
     const DeleteItem = (Product) => {
         props.handleSetState((PrevState) => {
-            const NewProducts = PrevState.Products.filter(Item => Item.Code !== Product.Code)
+            const NewProducts = PrevState.Products.filter(Item => Item.Name !== Product.Name)
             return {"Products": NewProducts}
         })
     }
@@ -514,7 +519,7 @@ function ProductsTable(props) {
             Product.Quantity.toFixed(3)
 
         return (
-            <tr key={Product.Code}>
+            <tr key={Product.Name}>
                 <td>  {VisualQuantity}                                      </td>
                 <td>  {Product.Name}                                        </td>
                 <td>$ {Product.UnitPrice.toFixed(2)}                        </td>
