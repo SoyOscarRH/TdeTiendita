@@ -83,6 +83,57 @@ END //
 
 DELIMITER ;
 
+/* ======================================================
+ * =====              EXIST BARCODE?             ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS ExistsBarcode;
+DELIMITER //
+CREATE PROCEDURE ExistsBarcode(IN InputBarcode VARCHAR(15))
+BEGIN
+    SELECT Barcode, ProductID FROM Barcode 
+        WHERE Barcode.Barcode = InputBarcode;
+END //
+DELIMITER ;
+
+
+/* ======================================================
+ * =====             EDIT PRODUCT                ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS EditProductData;
+DELIMITER //
+CREATE PROCEDURE EditProductData
+    (IN InputID INT, IN InputName VARCHAR(100), IN InputDescription VARCHAR(300), IN InputPriceOfSale DOUBLE, IN InputPriceAcquisition DOUBLE, IN InputCurrentQuantity DOUBLE)
+BEGIN
+    UPDATE Product
+        SET 
+            Product.Name = InputName,
+            Product.Description = InputDescription,
+            Product.PriceOfSale = InputPriceOfSale,
+            Product.PriceAcquisition = InputPriceAcquisition,
+            Product.CurrentQuantity = InputCurrentQuantity
+
+        WHERE
+            Product.ID = InputID;
+END //
+DELIMITER ;
+
+
+/* ======================================================
+ * =====             ADD NEW CODE                ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS AddNewCode;
+DELIMITER //
+CREATE PROCEDURE AddNewCode(IN InputID INT, IN InputBarcode VARCHAR(15))
+BEGIN
+    INSERT INTO Barcode VALUES (InputBarcode, InputID);
+END //
+DELIMITER ;
+
+
+
 
 /*
 DROP PROCEDURE IF EXISTS addEmployee;

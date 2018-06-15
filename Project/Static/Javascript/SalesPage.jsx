@@ -151,6 +151,7 @@ export default class SalesPage extends React.Component {
                 <br />
                 <br />
 
+
                 {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                 {/*+++++++++          ERROR MODAL           ++++++++++++*/}
                 {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
@@ -616,8 +617,8 @@ function ProductsTable(props) {
             Product.Quantity.toFixed(3)
 
         return (
-            <tr key={Product.Name}>
-                <td>  {VisualQuantity}                                      </td>
+            <tr key={Product.Name} className="hoverable">
+                <td>  &ensp; {VisualQuantity}                               </td>
                 <td>  {ShowCuteMode(Product.Name)}                          </td>
                 <td>$ {Product.UnitPrice.toFixed(2)}                        </td>
                 <td>$ {(Product.UnitPrice * Product.Quantity).toFixed(2)}   </td>

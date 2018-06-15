@@ -34,10 +34,11 @@ WebApp.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 #+++++++     DATABASE CONFIGURATION  ++++++++
 #++++++++++++++++++++++++++++++++++++++++++++
 Connection = pymysql.connect(
-    host     = 'localhost',
-    user     = 'root',
-    password = '123Tienda',
-    db       = 'tdetiendita'
+    host       = 'localhost',
+    user       = 'root',
+    password   = '123Tienda',
+    db         = 'tdetiendita',
+    autocommit = True
 )
 
 Session(WebApp)
@@ -118,6 +119,30 @@ def SaleProducts():
 
     return json.dumps({"Result": "All ok"}) 
 
+
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++    DATA FROM BAR CODE       ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
+@WebApp.route("/SaveProductEdit", methods=['POST'])
+def SaveProductEdit():
+    
+    Data = request.json
+    print(Data)
+
+    with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
+        if Data['NewCode'] != "":
+            Cursor.execute("CALL ExistsBarcode(%s);", (Data['NewCode'], ) )
+            
+            if Cursor.fetchall() != ():
+                return json.dumps({"Error": "Nuevo código de barras ya ocupado"}) 
+            else:
+                Cursor.execute("CALL AddNewCode(%s, %s);", (Data['ID'], Data['NewCode']))
+        
+        Cursor.execute("CALL EditProductData(%s, %s, %s, %s, %s, %s);", \
+        (Data['ID'], Data['Name'], Data['Description'], Data['PriceOfSale'], Data['PriceAcquisition'], Data['CurrentQuantity']) ) 
+
+
+    return json.dumps({"Result": "All ok"}) 
 
 
 

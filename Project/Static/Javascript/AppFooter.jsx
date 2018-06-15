@@ -26,7 +26,7 @@ export default class AppFooter extends React.Component {
                         
                         {/*  =========  Text   ======== */}
                         <span className="grey-text text-lighten-4" style={{fontSize: '0.85rem'}}>
-                          This is a template for a web project
+                          T de Tiendita is a mexican store
                         </span>
                     </div>
 
@@ -40,12 +40,12 @@ export default class AppFooter extends React.Component {
                         {/*  =========  Text   ======== */}
                         <ul style={{fontSize: '0.85rem'}}>
                           <li>
-                            <a className="white-text" href="https://github.com/SoyOscarRH/">
-                              <b>Autor: </b>Oscar Andrés
+                            <a className="white-text" href="https://github.com/CompilandoConocimiento/">
+                              <b>Autors: </b>@CompilandoConocimiento
                             </a>
                           </li>
                           <li>
-                            <a className="white-text" href="https://github.com/SoyOscarRH/">
+                            <a className="white-text" href="https://github.com/SoyOscarRH/TdeTiendita">
                               Source Code
                             </a>
                           </li>
@@ -58,7 +58,7 @@ export default class AppFooter extends React.Component {
                 {/* ========================= */}
                 <div className="footer-copyright blue-grey darken-4">
                     <div className="container">
-                        <span className="text-lighten-3" style={{fontSize: '0.8rem'}}>December 25, 2017</span>
+                        <span className="text-lighten-3" style={{fontSize: '0.8rem'}}>Junio 15, 2018</span>
                         <br />
                         <b>Create by</b> <span className="text-lighten-3">CompilandoConocimiento</span>
                     </div>
