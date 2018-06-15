@@ -1,5 +1,6 @@
 import React from "react"
 import {Link} from "react-router-dom"
+import {ShowCuteMode} from "./CoolFunctions.js"
 
 // =====================================================================
 // ============     HEADER COMPONENT       =============================
@@ -62,9 +63,9 @@ export default class AppHeader extends React.Component {
                                   <img src="/Distribution/Graphics/BackgroundBlue.jpg" />
                                 </div>
 
-                                <a href="#user"><img className="circle" src="/Distribution/Graphics/BackgroundBlue.jpg" /></a>
-                                <a href="#name"><span className="white-text name">{UserName}</span></a>
-                                <a href="#email"><span className="white-text email">Pepito@perez.com</span></a>
+                                <a><img className="circle" src="/Distribution/Graphics/T.png" /></a>
+                                <a><span className="white-text name">{ShowCuteMode(UserName)}</span></a>
+                                <a><span className="white-text email">{UserName}</span></a>
                             </div>
                         </div>
                     </li>
@@ -117,6 +118,16 @@ export default class AppHeader extends React.Component {
                         <a className="waves-effect" href="#!">
                             <i className="material-icons">add_circle</i>
                             Añadir Productos
+                        </a>
+                    </li>
+                    <li><a className="subheader">Sesión</a></li>
+                    <li>
+                        <a
+                            className = "waves-effect"
+                            href = "/logout"
+                        >
+                            <i className="material-icons">exit_to_app</i>
+                            Cerrar Sesión
                         </a>
                     </li>
                 </ul>

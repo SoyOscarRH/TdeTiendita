@@ -26,6 +26,10 @@ export default class Home extends React.Component {
                             <br />
                             <br />
 
+                            <div className="row">
+                                <img className="circle z-depth-3" style={{width: "15%"}} src="/Distribution/Graphics/T.png" />
+                            </div>
+
                             Estas ahora mismo en el modo de 
                             <br />
                             <br />

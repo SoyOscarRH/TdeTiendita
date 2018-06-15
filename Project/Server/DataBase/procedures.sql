@@ -133,6 +133,19 @@ END //
 DELIMITER ;
 
 
+/* ======================================================
+ * =====                 LOG IN                  ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS LogIn;
+DELIMITER //
+CREATE PROCEDURE LogIn(IN Email VARCHAR(30), IN Password VARCHAR(30))
+BEGIN
+    SELECT isAdmin  FROM Employee
+        WHERE
+        Employee.Email = Email AND Employee.Password = MD5(CONCAT(Password, MD5(Password)));
+END //
+DELIMITER ;
 
 
 /*
@@ -171,17 +184,7 @@ END //
 DELIMITER ;
 
 
-DROP PROCEDURE IF EXISTS logIn;
-DELIMITER //
-CREATE PROCEDURE logIn(IN Email VARCHAR(30), IN Password VARCHAR(30), OUT salida INT)
-BEGIN
-    SET salida = -1;
-    SELECT ID into salida
-    FROM Employee
-    WHERE Employee.Email = Email
-    AND Employee.Password = MD5(CONCAT(Password, MD5(Password)));
-END //
-DELIMITER ;
+
 
 
 DROP PROCEDURE IF EXISTS addBrand;

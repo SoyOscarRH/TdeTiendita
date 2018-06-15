@@ -147,27 +147,30 @@ def SaveProductEdit():
 
 
 
-
-
-
-
-
-
-
 @WebApp.route('/login', methods = ['GET', 'POST'])
 def Login():
     if request.method == 'POST':
-        print(request.form)
-        session['UserName'] = str(request.form['UserName'])
-        print(str(session) + "session en login")
-        return redirect(url_for('index'))
+        print(f"La request es {request.form}")
+
+        with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
+            Cursor.execute("CALL LogIn(%s, %s);", (request.form['UserName'], request.form['Password']) )
+            Result = Cursor.fetchone()
+
+            if (Result == None): return render_template("login.html")
+
+            session['isAdmin'] = str(Result['isAdmin'])
+            session['UserName'] = str(request.form['UserName'])
+
+            print(str(session) + "session en login")
+            return redirect(url_for('index'))
+    
     else:
-        return render_template("Login.html")
+        return render_template("login.html")
 
 @WebApp.route('/logout')
 def Logout():
     session.clear()
-    return "listo"
+    return render_template("Logout.html")
 
 
 
