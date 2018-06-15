@@ -46,6 +46,10 @@
     - To close Dialogs use `esc`
 
 
-<img src="Graphics/SalesPage2.png" width="85%">
-<img src="Graphics/SalesPage3.png" width="85%">
-<img src="Graphics/SalesPage4.png" width="85%">
+
+<img src="Graphics/Showcase1.png" width="85%">
+<img src="Graphics/Showcase2.png" width="85%">
+<img src="Graphics/Showcase3.png" width="85%">
+<img src="Graphics/Showcase4.png" width="85%">
+<img src="Graphics/Showcase5.png" width="85%">
+<img src="Graphics/Showcase6.png" width="85%">
