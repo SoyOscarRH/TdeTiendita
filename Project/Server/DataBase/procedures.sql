@@ -104,7 +104,10 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS EditProductData;
 DELIMITER //
 CREATE PROCEDURE EditProductData
-    (IN InputID INT, IN InputName VARCHAR(100), IN InputDescription VARCHAR(300), IN InputPriceOfSale DOUBLE, IN InputPriceAcquisition DOUBLE, IN InputCurrentQuantity DOUBLE)
+    (
+        IN InputID INT, IN InputName VARCHAR(100), IN InputDescription VARCHAR(300), IN InputPriceOfSale DOUBLE, 
+        IN InputPriceAcquisition DOUBLE, IN InputCurrentQuantity DOUBLE
+    )
 BEGIN
     UPDATE Product
         SET 
@@ -141,11 +144,109 @@ DROP PROCEDURE IF EXISTS LogIn;
 DELIMITER //
 CREATE PROCEDURE LogIn(IN Email VARCHAR(30), IN Password VARCHAR(30))
 BEGIN
-    SELECT isAdmin  FROM Employee
+    SELECT ID, Name, isAdmin  FROM Employee
         WHERE
         Employee.Email = Email AND Employee.Password = MD5(CONCAT(Password, MD5(Password)));
 END //
 DELIMITER ;
+
+
+
+/* ======================================================
+ * =====               UNIT SALE                 ========
+ * ======================================================
+ */
+ DROP PROCEDURE IF EXISTS AddUnitSale;
+DELIMITER //
+CREATE PROCEDURE AddUnitSale(IN InputProductID INT, IN InputQuantitySell INT, IN InputSaleID INT)
+BEGIN
+    INSERT INTO UnitSale(ProductID, QuantitySell, SaleID)
+        VALUES (InputProductID, InputQuantitySell, InputSaleID);
+END //
+DELIMITER ;
+
+
+
+/* ======================================================
+ * =====               GENERAL SALE              ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS CreateSale;
+DELIMITER //
+CREATE PROCEDURE CreateSale(IN InputEmployeeID INT)
+BEGIN
+        INSERT INTO Sale(EmployeeID, DateOfSale)
+        VALUES (InputEmployeeID, NOW());
+
+    SELECT LAST_INSERT_ID() AS ID;
+END //
+DELIMITER ;
+
+
+
+/* ======================================================
+ * =====               GENERAL SALE              ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS GetProductID;
+DELIMITER //
+CREATE PROCEDURE GetProductID(IN InputName VARCHAR(100))
+BEGIN
+    SELECT ID FROM Product WHERE Product.Name = InputName;
+END //
+DELIMITER ;
+
+
+
+/* ======================================================
+ * =====               GET SALE                  ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS GetSaleID;
+DELIMITER //
+CREATE PROCEDURE GetSaleID(IN InputEmployeeID INT, IN InputDateStart VARCHAR(20), IN InputDateEnd VARCHAR(20))
+BEGIN
+    SELECT ID FROM Sale 
+        WHERE 
+            Sale.EmployeeID = InputEmployeeID        AND 
+            Sale.DateOfSale >= DATE(InputDateStart)  AND
+            Sale.DateOfSale <= DATE(InputDateEnd);  
+END //
+DELIMITER ;
+
+/* ======================================================
+ * =====               GET SALE                  ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS GetSaleID;
+DELIMITER //
+CREATE PROCEDURE GetSaleID(IN InputEmployeeID INT, IN InputDateStart VARCHAR(20), IN InputDateEnd VARCHAR(20))
+BEGIN
+    SELECT ID FROM Sale 
+        WHERE 
+            Sale.EmployeeID = InputEmployeeID        AND 
+            Sale.DateOfSale >= DATE(InputDateStart)  AND
+            Sale.DateOfSale <= DATE(InputDateEnd);  
+END //
+DELIMITER ;
+
+/* ======================================================
+ * =====               GET UNIT SALE             ========
+ * ======================================================
+ */
+DROP PROCEDURE IF EXISTS GetUnitSale;
+DELIMITER //
+CREATE PROCEDURE GetUnitSale(IN InputSaleID INT)
+BEGIN
+    SELECT UnitSale.SaleID, ProductID, Product.Name as Name, Product.PriceOfSale, QuantitySell, Sale.DateOfSale 
+        FROM UnitSale, Product, Sale
+        WHERE
+            InputSaleID = UnitSale.SaleID       AND
+            Sale.ID  = UnitSale.SaleID          AND 
+            Product.ID  = UnitSale.ProductID;
+END //
+DELIMITER ;
+
 
 
 /*

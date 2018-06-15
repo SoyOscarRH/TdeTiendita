@@ -30,7 +30,7 @@ export default class Home extends React.Component {
                                 <img className="circle z-depth-3" style={{width: "15%"}} src="/Distribution/Graphics/T.png" />
                             </div>
 
-                            Estas ahora mismo en el modo de 
+                            Estas ahora mismo en el modo de {isAdmin == "1"? "Administrador" : "Normal"}
                             <br />
                             <br />
                             <br />
@@ -54,20 +54,31 @@ export default class Home extends React.Component {
 
                         <div className="row">
                             <Link 
-                                className = "waves-effect waves-light btn-large light-green lighten-1"
+                                className = "waves-effect waves-light btn-large light-green lighten-1 col s8 offset-s2"
                                 to        = '/SalesPage'>
                                 Página de Ventas
                             </Link>
 
-                            <br />
-                            <br />
+                        </div>
+
+                        <br />
                             
+                        <div className="row">
                             <Link 
-                                className = "waves-effect waves-light btn-large blue lighten-1"
+                                className = "waves-effect waves-light btn-large blue lighten-1 col s8 offset-s2"
                                 to        = '/EditProduct'>
                                 Editar Productos
                             </Link>
+                        </div>
+
+                        <div className="row">
+                            <Link 
+                                className = "waves-effect waves-light btn-large indigo lighten-1 col s8 offset-s2"
+                                to        = '/Analytics'>
+                                Ver Ventas
+                            </Link>
                         </div> 
+                        <br />
                     </div>
                 </div>
 

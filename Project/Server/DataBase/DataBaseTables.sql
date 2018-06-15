@@ -110,6 +110,7 @@ CREATE TABLE Product (
 	PriceAcquisition    DOUBLE NOT NULL,
 	CurrentQuantity     DOUBLE NOT NULL,
 	IDBrand             INT NOT NULL,
+	isAdmin             SHORT INT NOT NULL,
 
 	PRIMARY KEY(ID),
 	UNIQUE(Name),

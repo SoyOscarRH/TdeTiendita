@@ -46,7 +46,7 @@
     
   <BODY>
     <div id="ReactApp" />
-    <script> const UserName = "{{ session['UserName'] }}" </script>
+    <script> const UserName = "{{ session['UserName'] }}"; const isAdmin = "{{ session['isAdmin'] }}" </script>
     <script src="{{ url_for('static', filename = 'bundle.js') }}" type="text/javascript"></script>
   </BODY>
 

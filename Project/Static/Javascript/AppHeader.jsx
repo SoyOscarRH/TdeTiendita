@@ -65,7 +65,7 @@ export default class AppHeader extends React.Component {
 
                                 <a><img className="circle" src="/Distribution/Graphics/T.png" /></a>
                                 <a><span className="white-text name">{ShowCuteMode(UserName)}</span></a>
-                                <a><span className="white-text email">{UserName}</span></a>
+                                <a><span className="white-text email">{UserName}@tdetiendita.com</span></a>
                             </div>
                         </div>
                     </li>
@@ -81,18 +81,14 @@ export default class AppHeader extends React.Component {
                     </li>
                     <li><a className="subheader">Analíticas</a></li>
                     <li>
-                        <a className="waves-effect" href="#!">
+                        <Link
+                            className = "waves-effect"
+                            to        = '/Analytics'
+                            onClick   = {() => M.Sidenav.getInstance(document.getElementById("SideMenu")).close()}>
                             <i className="material-icons">assessment</i>
                             Resúmen de Ventas
-                        </a>
+                        </Link>
                     </li>
-                    <li>
-                        <a className="waves-effect" href="#!">
-                            <i className="material-icons">face</i>
-                            Contactar Proovedores
-                        </a>
-                    </li>
-
                     <li><div className="divider" /></li>
 
                     <li><a className="subheader">Productos</a></li>
@@ -113,12 +109,6 @@ export default class AppHeader extends React.Component {
                             <i className="material-icons">edit</i>
                             Editar Productos
                         </Link>
-                    </li>
-                    <li>
-                        <a className="waves-effect" href="#!">
-                            <i className="material-icons">add_circle</i>
-                            Añadir Productos
-                        </a>
                     </li>
                     <li><a className="subheader">Sesión</a></li>
                     <li>

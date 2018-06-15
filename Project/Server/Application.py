@@ -55,8 +55,6 @@ def index():
     
     User = session.get('UserName', None)
 
-    print(session)
-
     if User:
         return render_template("index.html")
     else:
@@ -73,7 +71,7 @@ def GetProductDataFromBarCode():
     if BarCode == None: return json.dumps({"Error": f"Error con el código de barras"})
 
     with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
-        Cursor.execute("CALL GetProductDataFromBarCode(%s);", (BarCode,) )
+        Cursor.callproc("GetProductDataFromBarCode", (BarCode,) )
         Results = Cursor.fetchone()
 
         if Results == None: 
@@ -91,7 +89,7 @@ def GetAllProductData():
     ProductQuery = request.json.replace(" ", "%")
 
     with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
-        Cursor.execute("CALL GetAllProductDataExceptBarcode(%s);", (ProductQuery,) )
+        Cursor.callproc("GetAllProductDataExceptBarcode", (ProductQuery,) )
         ProductsData = Cursor.fetchall()
 
         if ProductsData == (): 
@@ -100,7 +98,7 @@ def GetAllProductData():
         RealData = []
 
         for ProductData in ProductsData:
-            Cursor.execute("CALL GetAllBarcodesFromProductID(%s);", (ProductData['ID'],) )
+            Cursor.callproc("GetAllBarcodesFromProductID", (ProductData['ID'],) )
             BarCodes = Cursor.fetchall()
             BarCodes = [Code['Barcode'] for Code in BarCodes]
             RealData.append({**ProductData, "BarCodes": BarCodes}) 
@@ -115,64 +113,111 @@ def GetAllProductData():
 def SaleProducts():
     
     Data = request.json
-    print(Data)
+
+    with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
+        Cursor.callproc("CreateSale", (session['ID'],) )
+        SaleID = Cursor.fetchone()['ID']
+
+        with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
+            for Sale in Data:
+
+                Cursor.callproc("GetProductID", (Sale['Name'],) )
+                ProductID = Cursor.fetchone()['ID']
+
+                Cursor.callproc("AddUnitSale", (ProductID, Sale['Quantity'], SaleID) )
+
 
     return json.dumps({"Result": "All ok"}) 
 
 
+
+
+
 #++++++++++++++++++++++++++++++++++++++++++++
-#+++++++    DATA FROM BAR CODE       ++++++++
+#+++++++    SAVE DATA EDITS          ++++++++
 #++++++++++++++++++++++++++++++++++++++++++++
 @WebApp.route("/SaveProductEdit", methods=['POST'])
 def SaveProductEdit():
     
     Data = request.json
-    print(Data)
+
+    if session['isAdmin'] == "0":
+        return json.dumps({"Error": "No tienes permisos para editar productos"}) 
 
     with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
         if Data['NewCode'] != "":
-            Cursor.execute("CALL ExistsBarcode(%s);", (Data['NewCode'], ) )
+            Cursor.callproc("ExistsBarcode", (Data['NewCode'], ) )
             
             if Cursor.fetchall() != ():
                 return json.dumps({"Error": "Nuevo código de barras ya ocupado"}) 
             else:
-                Cursor.execute("CALL AddNewCode(%s, %s);", (Data['ID'], Data['NewCode']))
+                Cursor.callproc("AddNewCode", (Data['ID'], Data['NewCode']))
         
-        Cursor.execute("CALL EditProductData(%s, %s, %s, %s, %s, %s);", \
+        Cursor.callproc("EditProductData", \
         (Data['ID'], Data['Name'], Data['Description'], Data['PriceOfSale'], Data['PriceAcquisition'], Data['CurrentQuantity']) ) 
-
 
     return json.dumps({"Result": "All ok"}) 
 
 
 
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++    GET SALES FROM S DATES   ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
+@WebApp.route("/GetSalesFromDates", methods=['POST'])
+def GetSalesFromDates():
+    
+    Data = request.json
 
+    print (Data)
+
+    with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
+        Cursor.callproc("GetSaleID", (session['ID'], Data['DateStart'], Data['DateEnd']) )
+
+        Results = Cursor.fetchall()
+        Sales = []
+
+        for Result in Results:
+            Cursor.callproc("GetUnitSale", (Result['ID'], ) )
+            UnitSales = Cursor.fetchall()
+
+            if UnitSales != (): Sales.append(UnitSales)
+
+    return json.dumps(Sales)
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++          LOGIN              ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
 @WebApp.route('/login', methods = ['GET', 'POST'])
 def Login():
     if request.method == 'POST':
-        print(f"La request es {request.form}")
 
         with Connection.cursor(pymysql.cursors.DictCursor) as Cursor:
-            Cursor.execute("CALL LogIn(%s, %s);", (request.form['UserName'], request.form['Password']) )
+            Cursor.callproc("LogIn", (request.form['UserName'], request.form['Password']) )
             Result = Cursor.fetchone()
 
             if (Result == None): return render_template("login.html")
 
             session['isAdmin'] = str(Result['isAdmin'])
-            session['UserName'] = str(request.form['UserName'])
+            session['UserName'] = str(Result['Name'])
+            session['ID'] = str(Result['ID'])
 
-            print(str(session) + "session en login")
             return redirect(url_for('index'))
     
     else:
         return render_template("login.html")
 
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++
+#+++++++           LOG OUT           ++++++++
+#++++++++++++++++++++++++++++++++++++++++++++
 @WebApp.route('/logout')
 def Logout():
     session.clear()
     return render_template("Logout.html")
-
-
 
 
 

@@ -7,6 +7,7 @@ import AppFooter from "./AppFooter"
 import SalesPage from "./SalesPage"
 import Home from "./Home"
 import EditProduct from "./EditProduct"
+import Analytics from "./Analytics"
 
 
 
@@ -29,6 +30,7 @@ export default class App extends React.Component {
                           <Route exact path='/' component={Home}/>
                           <Route path='/SalesPage' component={SalesPage}/>
                           <Route path='/EditProduct' component={EditProduct}/>
+                          <Route path='/Analytics' component={Analytics}/>
                         </Switch>
                     </div>
                 </main>

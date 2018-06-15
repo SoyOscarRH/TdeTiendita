@@ -75,7 +75,6 @@ export default class SalesPage extends React.Component {
     AddProduct(NewProduct) {
         const Products = [...this.state.Products]
 
-
         // ++++++++++++++++++++++++++++++++++++++++++++
         // ++    WE HAVE THE PRODUCT IN THE LIST?    ++
         // ++++++++++++++++++++++++++++++++++++++++++++
