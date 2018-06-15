@@ -3,7 +3,7 @@
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 import React from "react"
 import {HotKeys} from "react-hotkeys"
-import {SentData} from "./CoolFunctions.js"
+import {SentData, ShowCuteMode} from "./CoolFunctions.js"
 import ErrorModal from "./ErrorModal"
 
 
@@ -126,7 +126,8 @@ export default class SalesPage extends React.Component {
                 <div className="section">
                     <SectionToAddNewProduct 
                         ref              = {this.SectionToAddNewProduct}
-                        ShowErrorMessage = {(Message, CallbackOnClose) => this.ErrorModal.current.ShowErrorMessage(Message, CallbackOnClose)}
+                        ShowErrorMessage = {(Message, CallbackOnClose) => 
+                                                this.ErrorModal.current.ShowErrorMessage(Message, CallbackOnClose)}
                         AddProduct       = {(Product) => this.AddProduct(Product)}
                         AutoFocus        = {true}
                     />
@@ -138,7 +139,10 @@ export default class SalesPage extends React.Component {
                 {/*=====================================================*/}
                 <div className="divider" />
                 <div className="section">
-                    <ProductsTable Products={this.state.Products} handleSetState={(Function) => this.setState(Function)}/>
+                    <ProductsTable 
+                        Products       = {this.state.Products} 
+                        handleSetState = {(Function) => this.setState(Function)}
+                    />
                 </div>
 
                 <br />
@@ -240,6 +244,7 @@ class SectionToAddNewProduct extends React.Component {
                 SearchInput: "",
                 IsPrice: false,
             },
+            CurrentSearch: [],
         }
     }
 
@@ -289,95 +294,163 @@ class SectionToAddNewProduct extends React.Component {
     /* 
      * Add CurrentSale to the products array
      */
-    handleAddCurrentProduct () {
+    handleAddCurrentProduct (SpecialSale = null) {
 
-        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        // ++++++           CHECK THE PRODUCT             +++++++++
-        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        const Sale = Object.assign({}, this.state.CurrentSale)
-
-        if (Sale.BarCodeInput.split(" ").length === 2 && (Sale.BarCodeInput[0] === '$' || Sale.BarCodeInput[0] > -1)) {
-            const BarCodeInputAndBarCodeInput = Sale.BarCodeInput.split(" ")
+        const Sale = SpecialSale == null? Object.assign({}, this.state.CurrentSale) : SpecialSale
+        
+        if (Sale.SearchInput.length > 0) {
             
-            Sale.QuantityInput = BarCodeInputAndBarCodeInput[0]
-            Sale.BarCodeInput  = BarCodeInputAndBarCodeInput[1]
+            // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            // ++++++           CHECK THE SEARCH              +++++++++
+            // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++    
+            SentData('/GetAllProductData', Sale.SearchInput)
+            .then(Results => {
+
+                // ++++++++++++++++++++++++++++++++++++++++++++
+                // ++++++          IF NOT FIND        +++++++++
+                // ++++++++++++++++++++++++++++++++++++++++++++
+                if (Results['Error'] != undefined) {
+
+                    const ErrorMessage = (
+                        <div>
+                            <h5> Error con el Producto </h5>
+                            <br />
+                            {Results['Error']}
+                            <br />
+                            <div>
+                                Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
+                            </div>
+                        </div>
+                    )
+
+                    this.props.ShowErrorMessage(ErrorMessage, () => this.handleChangeOfFocus({Position: "BarCodeInput"}))
+
+                    Sale.BarCodeInput = ""
+                    Sale.SearchInput = ""
+                    Sale.QuantityInput = Sale.IsPrice? "$" + String(Sale.QuantityInput): String(Sale.QuantityInput)
+                    this.setState({"CurrentSale": Sale})
+                }
+                else {
+
+                    // ++++++++++++++++++++++++++++++++++++++++++++
+                    // ++++   SET THE STATE AS IT SHOULD   ++++++++
+                    // ++++++++++++++++++++++++++++++++++++++++++++
+                    const NewSearch = Results.map(Element => {
+                        return {Name: Element.Name, Price: Element.PriceOfSale, Barcode: Element.BarCodes[0]}
+                    })
+
+                    const Elements = document.getElementById('SearchInputDropdown')
+                    const Options = {
+                        autoTrigger: true, 
+                        constrainWidth: false,
+                        onCloseEnd: () => {
+                            const Instance = M.Dropdown.getInstance(Elements)
+                            if (Instance != undefined) Instance.destroy()
+                        }
+                    }
+                    M.Dropdown.init(Elements, Options)
+
+                    this.setState({CurrentSearch: NewSearch})
+                }
+            })
+            .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
         }
+        else {
 
-        Sale.QuantityInput = Sale.QuantityInput.toUpperCase().trim()
-        Sale.BarCodeInput = Sale.BarCodeInput.toUpperCase().trim()
-        Sale.IsPrice = Sale.QuantityInput[0] === '$'
-        Sale.QuantityInput = Number(Sale.QuantityInput.slice(Sale.IsPrice? 1: 0))
+            // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            // ++++++           CHECK THE PRODUCT             +++++++++
+            // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            if (Sale.BarCodeInput.split(" ").length === 2 && (Sale.BarCodeInput[0] === '$' || Sale.BarCodeInput[0] > -1)) {
+                const BarCodeInputAndBarCodeInput = Sale.BarCodeInput.split(" ")
+                
+                Sale.QuantityInput = BarCodeInputAndBarCodeInput[0]
+                Sale.BarCodeInput  = BarCodeInputAndBarCodeInput[1]
+            }
 
-        if (Number.isNaN(Sale.QuantityInput) || Sale.QuantityInput <= 0) {
-            const ErrorMessage = (
-                <div>
-                    <h5> Error con el Precio ó Cantidad </h5>
-                    <br />
-                    Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
-                </div>
-            )
+            Sale.QuantityInput = Sale.QuantityInput.toUpperCase().trim()
+            Sale.BarCodeInput = Sale.BarCodeInput.toUpperCase().trim()
+            Sale.IsPrice = Sale.QuantityInput[0] === '$'
+            Sale.QuantityInput = Number(Sale.QuantityInput.slice(Sale.IsPrice? 1: 0))
 
-            this.props.ShowErrorMessage(ErrorMessage, () => this.handleChangeOfFocus({Position: "QuantityInput"}))
-            return
-        }
-
-
-        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        // ++++++     SEND TO FIND THE PRICE AND NAME     +++++++++
-        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        SentData('/GetProductDataFromBarCode', Sale.BarCodeInput)
-        .then(Results => {
-
-            // ++++++++++++++++++++++++++++++++++++++++++++
-            // ++++++          IF NOT FIND        +++++++++
-            // ++++++++++++++++++++++++++++++++++++++++++++
-            if (Results['Error'] != undefined) {
-
+            if (Number.isNaN(Sale.QuantityInput) || Sale.QuantityInput <= 0) {
                 const ErrorMessage = (
                     <div>
-                        <h5> Error con el Producto </h5>
+                        <h5> Error con el Precio ó Cantidad </h5>
                         <br />
-                        {Results['Error']}
-                        <br />
-                        <div>
-                            Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
-                        </div>
+                        Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
                     </div>
                 )
 
-                this.props.ShowErrorMessage(ErrorMessage, () => this.handleChangeOfFocus({Position: "BarCodeInput"}))
-
-                Sale.BarCodeInput = ""
-                Sale.SearchInput = ""
-                Sale.QuantityInput = Sale.IsPrice? "$" + String(Sale.QuantityInput): String(Sale.QuantityInput)
-                this.setState({"CurrentSale": Sale})
+                this.props.ShowErrorMessage(ErrorMessage, () => this.handleChangeOfFocus({Position: "QuantityInput"}))
+                return
             }
-            else {
-                // ++++++++++++++++++++++++++++++++++++++++++++
-                // ++++   SET THE STATE AS IT SHOULD   ++++++++
-                // ++++++++++++++++++++++++++++++++++++++++++++
 
-                Sale.QuantityInput = Number(Sale.QuantityInput)
-                const NewQuantity = (Sale.IsPrice)? Sale.QuantityInput / Number(Results['UnitPrice']): Sale.QuantityInput
 
-                const Product = {
-                    Quantity: NewQuantity,
-                    Name: Results['Name'],
-                    UnitPrice: Results['UnitPrice'],
+            // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            // ++++++     SEND TO FIND THE PRICE AND NAME     +++++++++
+            // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            SentData('/GetProductDataFromBarCode', Sale.BarCodeInput)
+            .then(Results => {
+
+                // ++++++++++++++++++++++++++++++++++++++++++++
+                // ++++++          IF NOT FIND        +++++++++
+                // ++++++++++++++++++++++++++++++++++++++++++++
+                if (Results['Error'] != undefined) {
+
+                    const ErrorMessage = (
+                        <div>
+                            <h5> Error con el Producto </h5>
+                            <br />
+                            {Results['Error']}
+                            <br />
+                            <div>
+                                Para salir de este diálogo puedes presionar la tecla 'esc' ó 'enter'
+                            </div>
+                        </div>
+                    )
+
+                    this.props.ShowErrorMessage(ErrorMessage, () => this.handleChangeOfFocus({Position: "BarCodeInput"}))
+
+                    Sale.BarCodeInput = ""
+                    Sale.SearchInput = ""
+                    Sale.QuantityInput = Sale.IsPrice? "$" + String(Sale.QuantityInput): String(Sale.QuantityInput)
+                    this.setState({"CurrentSale": Sale})
                 }
+                else {
+                    // ++++++++++++++++++++++++++++++++++++++++++++
+                    // ++++   SET THE STATE AS IT SHOULD   ++++++++
+                    // ++++++++++++++++++++++++++++++++++++++++++++
 
-                this.props.AddProduct(Product)
+                    Sale.QuantityInput = Number(Sale.QuantityInput)
+                    const NewQuantity = (Sale.IsPrice)? Sale.QuantityInput / Number(Results['UnitPrice']): Sale.QuantityInput
 
-                Sale.QuantityInput = "1"
-                Sale.BarCodeInput = ""
-                Sale.SearchInput = ""
-                this.handleChangeOfFocus({Position: "BarCodeInput"})
-                this.setState({"CurrentSale": Sale})
-            }
-        })
-        .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
+                    const Product = {
+                        Quantity: NewQuantity,
+                        Name: Results['Name'],
+                        UnitPrice: Results['UnitPrice'],
+                    }
+
+                    this.props.AddProduct(Product)
+
+                    Sale.QuantityInput = "1"
+                    Sale.BarCodeInput = ""
+                    Sale.SearchInput = ""
+                    this.handleChangeOfFocus({Position: "BarCodeInput"})
+                    this.setState({"CurrentSale": Sale})
+                }
+            })
+            .catch(ErrorMessageFromServer => console.log(ErrorMessageFromServer))
+        }
     }
 
+
+    componentDidUpdate() {
+        M.updateTextFields()
+
+        const Elements = document.getElementById('SearchInputDropdown')
+        const Instance = M.Dropdown.getInstance(Elements)
+        if (Instance != undefined) Instance.open()
+    }
 
     // =========================================================
     // ============           RENDER              ==============
@@ -473,6 +546,7 @@ class SectionToAddNewProduct extends React.Component {
                             </span>
                         </label>
                     </div>
+                    <a className="dropdown-trigger" id='SearchInputDropdown' data-target='SearchInputDropdownTarget' />
 
                     {/*+++++++++++++++++++++++++++++++++++++++++++++++++++++*/}
                     {/*+++++++++         ADD BUTTON             ++++++++++++*/}
@@ -488,6 +562,29 @@ class SectionToAddNewProduct extends React.Component {
                             </button>
                         </p>
                     </div>
+
+                    <ul id='SearchInputDropdownTarget' className='dropdown-content'>
+                        {this.state.CurrentSearch.map(Element => {
+                            return (
+                                <li key={Element.Name}>
+                                    <a onClick={() => {
+                                            const Sale = Object.assign({}, this.state.CurrentSale)
+                                            Sale.BarCodeInput = Element.Barcode
+                                            Sale.SearchInput = ""
+
+                                            const DropElement = document.getElementById("SearchInputDropdown")
+                                            M.Dropdown.getInstance(DropElement).destroy()
+
+                                            this.handleAddCurrentProduct(Sale)
+                                        }
+                                    }>
+                                        (${Element.Price}): {Element.Name}
+                                    </a>
+                                </li>        
+                            )
+                        })
+                        }
+                    </ul>
 
                 </div>
 
@@ -521,7 +618,7 @@ function ProductsTable(props) {
         return (
             <tr key={Product.Name}>
                 <td>  {VisualQuantity}                                      </td>
-                <td>  {Product.Name}                                        </td>
+                <td>  {ShowCuteMode(Product.Name)}                          </td>
                 <td>$ {Product.UnitPrice.toFixed(2)}                        </td>
                 <td>$ {(Product.UnitPrice * Product.Quantity).toFixed(2)}   </td>
                 <td>

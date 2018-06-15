@@ -1,6 +1,6 @@
 import React from "react"
 import {HotKeys} from "react-hotkeys"
-import {SentData} from "./CoolFunctions.js"
+import {SentData, ShowCuteMode, CapitalizeFirstLetter} from "./CoolFunctions.js"
 import ErrorModal from "./ErrorModal"
 
 
@@ -12,25 +12,25 @@ export default class EditProduct extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            ShowButton: false,
-            ProductQuery: "", 
             ErrorMessage: "",
             Products: [],
         }
 
+        this.ProductQuery = React.createRef()
         this.ErrorModal = React.createRef()
     }
 
     handleSendQuery() {
+        const ProductQuery = this.ProductQuery.current.value
 
-        if (this.state.ProductQuery.trim().length < 2) {
+        if (ProductQuery.trim().length < 2) {
             this.setState({Products: []})
             M.toast({html: 'No se pudo hacer una búsqueda con tan poca información'})
             document.getElementById("ProductQueryInput").focus()
             return
         }
 
-        SentData('/GetAllProductData', this.state.ProductQuery)
+        SentData('/GetAllProductData', ProductQuery)
             .then(Results => {
                 // ++++++++++++++++++++++++++++++++++++++++++++
                 // ++++++          IF NOT FIND        +++++++++
@@ -80,7 +80,7 @@ export default class EditProduct extends React.Component {
                 <li key={Product.Name}>
                     <div className="collapsible-header">
                         <div className="left-align" style={{fontSize: '1.5rem'}}>
-                            {Product.Name}
+                            {ShowCuteMode(Product.Name)}
                         </div>
                     </div>
                     <div className="collapsible-body blue-grey-text text-darken-3">
@@ -89,17 +89,17 @@ export default class EditProduct extends React.Component {
                             <div className="col s10 m8 l8">
                                 <div className="left-align">
                                     <span style={{fontSize: '1.15rem'}}>
-                                        {Product.Description}
+                                        {CapitalizeFirstLetter(Product.Description)}
                                     </span>
 
                                     <ul>
                                         <li>
                                             <strong>Marca: </strong>
-                                            {Product.BrandName}
+                                            {ShowCuteMode(Product.BrandName)}
                                         </li>
                                         <li>
                                             <strong>Proovedor: </strong>
-                                            {Product.ProviderName}
+                                            {ShowCuteMode(Product.ProviderName)}
                                         </li>
                                     </ul>
 
@@ -157,8 +157,7 @@ export default class EditProduct extends React.Component {
                                             autoFocus = {true} 
                                             id        = "ProductQueryInput" 
                                             type      = "text"
-                                            value     = {this.state.ProductQuery}
-                                            onChange  = {(e) => this.setState({ProductQuery: e.target.value})}
+                                            ref       = {this.ProductQuery}
                                         />
                                     </div>
                                     <div className="input-field col s2">
