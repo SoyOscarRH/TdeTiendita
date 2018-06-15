@@ -25,7 +25,7 @@
 
 ### Sales Page
 
-<img src="Graphics/SalesPage1.png" width="85%">
+<img src="Graphics/Showcase3.png" width="85%">
 
 
 - Autofocus in codebar
@@ -49,7 +49,6 @@
 
 <img src="Graphics/Showcase1.png" width="85%">
 <img src="Graphics/Showcase2.png" width="85%">
-<img src="Graphics/Showcase3.png" width="85%">
 <img src="Graphics/Showcase4.png" width="85%">
 <img src="Graphics/Showcase5.png" width="85%">
 <img src="Graphics/Showcase6.png" width="85%">
